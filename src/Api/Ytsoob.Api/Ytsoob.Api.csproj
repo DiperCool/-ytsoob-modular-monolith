@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>Ytsoob.Api</AssemblyName>
+    <RootNamespace>Ytsoob.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Identity\Ytsoob.Modules.Identity\Ytsoob.Modules.Identity.csproj" />
+  </ItemGroup>
+</Project>
