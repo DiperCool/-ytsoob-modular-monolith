@@ -1,3 +1,4 @@
+using Asp.Versioning.Conventions;
 using BuildingBlocks.Abstractions.CQRS.Query;
 using BuildingBlocks.Abstractions.Web;
 using Hellang.Middleware.ProblemDetails;
@@ -9,35 +10,39 @@ namespace Ytsoob.Modules.Identity.Users.Features.GettingUerByEmail.v1;
 // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis
 public static class GetUserByEmailEndpoint
 {
-    internal static RouteHandlerBuilder MapGetUserByEmailEndpoint(this IEndpointRouteBuilder endpoints)
-    {
-        return endpoints
-            .MapGet("/by-email/{email}", GetUserByEmail)
-            .AllowAnonymous()
-            .WithTags(UsersConfigs.Tag)
-            .Produces<RegisterUserResponse>(StatusCodes.Status200OK)
-            .Produces<StatusCodeProblemDetails>(StatusCodes.Status404NotFound)
-            .Produces<StatusCodeProblemDetails>(StatusCodes.Status400BadRequest)
-            .WithName("GetUserByEmail")
-            .WithDisplayName("Get User by email.")
-            .WithOpenApi(
-                operation =>
-                    new(operation) { Description = "Getting User by email.", Summary = "Getting User by email." }
-            );
-    }
-
-    private static async Task<IResult> GetUserByEmail(
-        [FromRoute] string email,
-        IGatewayProcessor<IdentityModuleConfiguration> queryProcessor,
-        CancellationToken cancellationToken
-    )
-    {
-        return await queryProcessor.ExecuteQuery(async processor =>
+  internal static IEndpointRouteBuilder MapGetUserByEmailEndpoint(
+    this IEndpointRouteBuilder endpoints
+  )
+  {
+    endpoints
+      .MapGet($"{UsersConfigs.UsersPrefixUri}/by-email/{{email}}", GetUserByEmail)
+      .AllowAnonymous()
+      .WithTags(UsersConfigs.Tag)
+      .Produces<RegisterUserResponse>(StatusCodes.Status200OK)
+      .Produces<StatusCodeProblemDetails>(StatusCodes.Status404NotFound)
+      .Produces<StatusCodeProblemDetails>(StatusCodes.Status400BadRequest)
+      .WithName("GetUserByEmail")
+      .WithDisplayName("Get User by email.")
+      .WithOpenApi(operation =>
+        new(operation)
         {
+          Description = "Getting User by email.",
+          Summary = "Getting User by email."
+        }
+      )
+      .WithApiVersionSet(UsersConfigs.VersionSet)
+      .HasApiVersion(1.0);
+    return endpoints;
+  }
 
-            var result = await processor.SendAsync(new GetUserByEmail(email), cancellationToken);
+  private static async Task<IResult> GetUserByEmail(
+    [FromRoute] string email,
+    [FromServices] IQueryProcessor queryProcessor,
+    CancellationToken cancellationToken
+  )
+  {
+    var result = await queryProcessor.SendAsync(new GetUserByEmail(email), cancellationToken);
 
-            return Results.Ok(result);
-        });
-    }
+    return Results.Ok(result);
+  }
 }

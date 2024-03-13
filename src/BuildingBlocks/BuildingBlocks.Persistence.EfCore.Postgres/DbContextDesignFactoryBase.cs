@@ -8,31 +8,22 @@ namespace BuildingBlocks.Persistence.EfCore.Postgres;
 public abstract class DbContextDesignFactoryBase<TDbContext> : IDesignTimeDbContextFactory<TDbContext>
     where TDbContext : DbContext
 {
-    private readonly string _postgresOptionSection;
+    private readonly string _connectionString;
 
-    protected DbContextDesignFactoryBase(string postgresOptionSection)
+    protected DbContextDesignFactoryBase(string connectionString)
     {
-        _postgresOptionSection = postgresOptionSection;
+        _connectionString = connectionString;
     }
 
     public TDbContext CreateDbContext(string[] args)
     {
         Console.WriteLine($"BaseDirectory: {AppContext.BaseDirectory}");
-        Console.WriteLine($"Postgres Option Section: {_postgresOptionSection}");
+        Console.WriteLine($"Postgres Connection String: {_connectionString}");
 
-        var configuration = ConfigurationHelper.GetConfiguration(AppContext.BaseDirectory);
-        var options = configuration.GetOptions<PostgresOptions>(_postgresOptionSection);
-
-        if (string.IsNullOrWhiteSpace(options?.ConnectionString))
-        {
-            throw new InvalidOperationException("Could not find a connection string.");
-        }
-
-        Console.WriteLine($"Connection String: {options.ConnectionString}");
 
         var optionsBuilder = new DbContextOptionsBuilder<TDbContext>()
             .UseNpgsql(
-                options.ConnectionString,
+                _connectionString,
                 sqlOptions =>
                 {
                     sqlOptions.MigrationsAssembly(GetType().Assembly.FullName);
@@ -40,7 +31,7 @@ public abstract class DbContextDesignFactoryBase<TDbContext> : IDesignTimeDbCont
                 }
             ).UseSnakeCaseNamingConvention();
 
-        Console.WriteLine(options.ConnectionString);
+        Console.WriteLine(_connectionString);
         return (TDbContext)Activator.CreateInstance(typeof(TDbContext), optionsBuilder.Options);
     }
 }

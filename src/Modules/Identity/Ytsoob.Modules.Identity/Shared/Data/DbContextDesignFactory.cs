@@ -4,7 +4,7 @@ namespace Ytsoob.Modules.Identity.Shared.Data;
 
 public class DbContextDesignFactory : DbContextDesignFactoryBase<IdentityContext>
 {
-    public DbContextDesignFactory() : base("Identity:PostgresOptions")
+    public DbContextDesignFactory() : base("Server=localhost;Port=5432;Database=ytsoob.services.identity;User Id=postgres;Password=postgres;")
     {
     }
 }
