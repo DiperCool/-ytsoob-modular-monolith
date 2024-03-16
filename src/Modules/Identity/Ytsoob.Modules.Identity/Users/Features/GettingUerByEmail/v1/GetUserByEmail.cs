@@ -5,7 +5,7 @@ using BuildingBlocks.Core.Exception;
 using Ytsoob.Modules.Identity.Shared.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
+using Ytsoob.Modules.Identity.Identity.Exceptions;
 using Ytsoob.Modules.Identity.Users.Dtos.v1;
 using Ytsoob.Modules.Identity.Shared.Models;
 

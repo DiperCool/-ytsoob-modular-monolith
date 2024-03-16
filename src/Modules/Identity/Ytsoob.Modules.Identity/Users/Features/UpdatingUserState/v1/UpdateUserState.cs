@@ -4,7 +4,7 @@ using BuildingBlocks.Abstractions.Messaging;
 using BuildingBlocks.Core.Exception;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
+using Ytsoob.Modules.Identity.Identity.Exceptions;
 using Ytsoob.Modules.Identity.Users.Features.UpdatingUserState.v1.Events.Integration;
 using Ytsoob.Modules.Identity.Shared.Models;
 

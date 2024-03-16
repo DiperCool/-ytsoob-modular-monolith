@@ -1,7 +1,7 @@
 using System.Net;
 using BuildingBlocks.Core.Exception.Types;
 
-namespace Ytsoob.Modules.Identity.Shared.Exceptions;
+namespace Ytsoob.Modules.Identity.Identity.Exceptions;
 
 public class IdentityUserNotFoundException : AppException
 {

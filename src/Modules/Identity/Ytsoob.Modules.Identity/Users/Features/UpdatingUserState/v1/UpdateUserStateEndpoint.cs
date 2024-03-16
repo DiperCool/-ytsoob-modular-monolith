@@ -1,5 +1,4 @@
 using Asp.Versioning.Conventions;
-using BuildingBlocks.Abstractions.CQRS.Command;
 using BuildingBlocks.Abstractions.Web;
 using Hellang.Middleware.ProblemDetails;
 using Swashbuckle.AspNetCore.Annotations;

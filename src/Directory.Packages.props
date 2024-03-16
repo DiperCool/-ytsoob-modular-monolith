@@ -36,7 +36,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftConfigurationVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftDependencyInjectionVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.22"/>
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="$(AspNetCoreVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.5"/>
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(AspNetCoreVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(AspNetCoreVersion)"/>
     <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="$(AspNetCoreVersion)"/>
@@ -180,6 +180,11 @@
     <PackageVersion Include="Duende.IdentityServer.AspNetIdentity" Version="6.2.0-rc.1"/>
     <PackageVersion Include="Duende.IdentityServer.EntityFramework" Version="6.2.0-rc.1"/>
     <PackageVersion Include="Duende.IdentityServer.Storage" Version="6.2.0-rc.1"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Minio" Version="5.0.0" />
+    <PackageVersion Include="Polly" Version="7.2.4" />
+    <PackageVersion Include="Minio.AspNetCore.HealthChecks" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

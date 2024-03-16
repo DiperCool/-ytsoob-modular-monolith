@@ -29,13 +29,16 @@ public static partial class ServiceCollectionExtensions
 
     public static IServiceCollection AddControllersAsServices(
         this IServiceCollection services,
-        params Assembly[] scanAssemblies)
+        params Assembly[] scanAssemblies
+    )
     {
-        var assemblies = scanAssemblies.Any() ? scanAssemblies : new[] {Assembly.GetCallingAssembly()};
+        var assemblies = scanAssemblies.Any() ? scanAssemblies : new[] { Assembly.GetCallingAssembly() };
 
-        return services.Scan(s => s.FromAssemblies(assemblies)
-            .AddClasses(f => f.AssignableTo(typeof(ControllerBase)))
-            .AsSelf()
-            .WithTransientLifetime());
+        return services.Scan(s =>
+            s.FromAssemblies(assemblies)
+                .AddClasses(f => f.AssignableTo(typeof(ControllerBase)))
+                .AsSelf()
+                .WithTransientLifetime()
+        );
     }
 }

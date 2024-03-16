@@ -67,6 +67,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Integration.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Core.IntegrationTests", "tests\building-blocks\Core\BuildingBlocks.Core.IntegrationTests\BuildingBlocks.Core.IntegrationTests.csproj", "{060A18B1-C769-472D-9C50-89044C01E5C5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ytsoobers", "Ytsoobers", "{0EE8C8D7-2B58-4644-A54E-0C9F4AD3F7BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ytsoob.Modules.Ytsoobers", "src\Modules\Ytsoobers\Ytsoob.Modules.Ytsoobers\Ytsoob.Modules.Ytsoobers.csproj", "{E65A2F6B-0A08-4DE0-8C52-B24505B230D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.BlobStorage", "src\BuildingBlocks.BlobStorage\BuildingBlocks.BlobStorage.csproj", "{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +112,9 @@ Global
 		{593F2CFF-66BB-4924-B028-3CF5A9202312} = {81288788-A347-41B0-8FA3-74B0D17414B2}
 		{2349AC81-E37B-4055-AEE4-73578331489E} = {FB247B5A-5299-4FFE-BE54-B7E1472D4A2E}
 		{060A18B1-C769-472D-9C50-89044C01E5C5} = {23204097-F83E-4FC3-98C5-316C07D5CC57}
+		{0EE8C8D7-2B58-4644-A54E-0C9F4AD3F7BB} = {9A277A93-3A5C-4E7E-A360-7ED4DD0E9DE1}
+		{E65A2F6B-0A08-4DE0-8C52-B24505B230D3} = {0EE8C8D7-2B58-4644-A54E-0C9F4AD3F7BB}
+		{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4} = {FB247B5A-5299-4FFE-BE54-B7E1472D4A2E}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9063E326-1CDF-4CA7-8D72-CA15AB532EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -192,5 +201,13 @@ Global
 		{060A18B1-C769-472D-9C50-89044C01E5C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{060A18B1-C769-472D-9C50-89044C01E5C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{060A18B1-C769-472D-9C50-89044C01E5C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E65A2F6B-0A08-4DE0-8C52-B24505B230D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E65A2F6B-0A08-4DE0-8C52-B24505B230D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E65A2F6B-0A08-4DE0-8C52-B24505B230D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E65A2F6B-0A08-4DE0-8C52-B24505B230D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F8A82EC-6E99-480B-AAE5-C93DFF757BF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

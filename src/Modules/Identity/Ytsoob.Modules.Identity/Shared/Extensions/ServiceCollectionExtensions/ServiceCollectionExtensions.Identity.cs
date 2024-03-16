@@ -32,7 +32,7 @@ public static partial class ServiceCollectionExtensions
                 $"{IdentityModuleConfiguration.ModuleName}:{nameof(PostgresOptions)}:UseInMemory"))
         {
             services.AddDbContext<IdentityContext>(options =>
-                options.UseInMemoryDatabase("Ytsoob.Modules.Identity"));
+                options.UseInMemoryDatabase("Ytsoob.Modules.Ytsoobers"));
 
             services.AddScoped<IDbFacadeResolver>(provider => provider.GetService<IdentityContext>()!);
         }

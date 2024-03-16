@@ -8,15 +8,16 @@ using BuildingBlocks.Web;
 using BuildingBlocks.Web.Extensions;
 using BuildingBlocks.Web.Extensions.ServiceCollectionExtensions;
 using BuildingBlocks.Web.Module;
-using Ytsoob.Api;
-using Ytsoob.Api.Extensions.ApplicationBuilderExtensions;
-using Ytsoob.Api.Extensions.ServiceCollectionExtensions;
-using Ytsoob.Modules.Identity;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Serilog;
 using Serilog.Events;
+using Ytsoob.Api;
+using Ytsoob.Api.Extensions.ApplicationBuilderExtensions;
+using Ytsoob.Api.Extensions.ServiceCollectionExtensions;
+using Ytsoob.Modules.Identity;
+using Ytsoob.Modules.Ytsoobers;
 
 // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis
 // https://benfoster.io/blog/mvc-to-minimal-apis-aspnet-6/
@@ -32,22 +33,28 @@ await app.RunAsync();
 
 static void RegisterServices(WebApplicationBuilder builder)
 {
-    builder.Host.UseDefaultServiceProvider((env, c) =>
-    {
-        // Handling Captive Dependency Problem
-        // https://ankitvijay.net/2020/03/17/net-core-and-di-beware-of-captive-dependency/
-        // https://levelup.gitconnected.com/top-misconceptions-about-dependency-injection-in-asp-net-core-c6a7afd14eb4
-        // https://blog.ploeh.dk/2014/06/02/captive-dependency/
-        if (env.HostingEnvironment.IsDevelopment() || env.HostingEnvironment.IsEnvironment("test") ||
-            env.HostingEnvironment.IsStaging())
+    builder.Host.UseDefaultServiceProvider(
+        (env, c) =>
         {
-            c.ValidateScopes = true;
+            // Handling Captive Dependency Problem
+            // https://ankitvijay.net/2020/03/17/net-core-and-di-beware-of-captive-dependency/
+            // https://levelup.gitconnected.com/top-misconceptions-about-dependency-injection-in-asp-net-core-c6a7afd14eb4
+            // https://blog.ploeh.dk/2014/06/02/captive-dependency/
+            if (
+                env.HostingEnvironment.IsDevelopment()
+                || env.HostingEnvironment.IsEnvironment("test")
+                || env.HostingEnvironment.IsStaging()
+            )
+            {
+                c.ValidateScopes = true;
+            }
         }
-    });
+    );
 
     builder.Configuration.AddModulesSettingsFile(
         builder.Environment.ContentRootPath,
-        builder.Environment.EnvironmentName);
+        builder.Environment.EnvironmentName
+    );
 
     // https://www.michaco.net/blog/EnvironmentVariablesAndConfigurationInASPNETCoreApps#environment-variables-and-configuration
     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#non-prefixed-environment-variables
@@ -71,22 +78,26 @@ static void RegisterServices(WebApplicationBuilder builder)
         config =>
         {
             config.WriteTo.File(
-                Ytsoob.Api.Program.GetLogPath(builder.Environment, loggingOptions) ??
-                "../logs/customers-service.log",
-                outputTemplate: loggingOptions?.LogTemplate ??
-                                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level} - {Message:lj}{NewLine}{Exception}",
+                Ytsoob.Api.Program.GetLogPath(builder.Environment, loggingOptions) ?? "../logs/customers-service.log",
+                outputTemplate: loggingOptions?.LogTemplate
+                    ?? "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level} - {Message:lj}{NewLine}{Exception}",
                 rollingInterval: RollingInterval.Day,
-                rollOnFileSizeLimit: true);
-        });
+                rollOnFileSizeLimit: true
+            );
+        }
+    );
 
     /*----------------- Module Services Setup ------------------*/
     builder.AddModulesServices(builder.Environment, useCompositionRootForModules: true);
 
     // https://andrewlock.net/controller-activation-and-dependency-injection-in-asp-net-core-mvc/
-    builder.Services.AddControllers(options =>
-            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())))
+    builder
+        .Services.AddControllers(options =>
+            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()))
+        )
         .AddNewtonsoftJson(options =>
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        );
 
     builder.Services.ReplaceTransient<IControllerActivator, CustomServiceBasedControllerActivator>();
 
@@ -94,18 +105,16 @@ static void RegisterServices(WebApplicationBuilder builder)
     builder.Services.AddCompression();
 
     builder.Services.AddCustomVersioning();
-    builder.AddCustomSwagger(new[]
-    {
-        typeof(IdentityRoot).Assembly,
-    });
+    builder.AddCustomSwagger(new[] { typeof(IdentityRoot).Assembly, typeof(YtsoobersRoot).Assembly, });
 
     builder.Services.AddCustomJwtAuthentication(builder.Configuration);
     builder.Services.AddCustomAuthorization(
         rolePolicies: new List<RolePolicy>
         {
-            new(ApiConstants.Role.Admin, new List<string> {ApiConstants.Role.Admin}),
-            new(ApiConstants.Role.User, new List<string> {ApiConstants.Role.User})
-        });
+            new(ApiConstants.Role.Admin, new List<string> { ApiConstants.Role.Admin }),
+            new(ApiConstants.Role.User, new List<string> { ApiConstants.Role.User })
+        }
+    );
 }
 
 static async Task ConfigureApplication(WebApplication app)
@@ -141,8 +150,6 @@ static async Task ConfigureApplication(WebApplication app)
         app.UseCustomSwagger();
     }
 
-    app.UseECommerceMonitoring();
-
     app.Lifetime.ApplicationStopping.Register(() =>
     {
         if (app.Environment.IsEnvironment("test") == false)
@@ -154,16 +161,14 @@ static async Task ConfigureApplication(WebApplication app)
         }
     });
 
-    Log.Logger = new LoggerConfiguration()
-        .WriteTo.Console()
-        .CreateBootstrapLogger();
+    Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 }
 
 namespace Ytsoob.Api
 {
     public partial class Program
     {
-        public static string? GetLogPath(IWebHostEnvironment env, LoggerOptions loggerOptions)
-            => env.IsDevelopment() ? loggerOptions.DevelopmentLogPath : loggerOptions.ProductionLogPath;
+        public static string? GetLogPath(IWebHostEnvironment env, LoggerOptions loggerOptions) =>
+            env.IsDevelopment() ? loggerOptions.DevelopmentLogPath : loggerOptions.ProductionLogPath;
     }
 }

@@ -10,20 +10,9 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddECommerceMonitoring(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
-        services.AddMonitoring(healthChecksBuilder =>
-        {
-            var identityPostgresOptions = configuration.GetOptions<PostgresOptions>(
-                $"{IdentityModuleConfiguration.ModuleName}:{nameof(PostgresOptions)}");
-            Guard.Against.Null(identityPostgresOptions, nameof(identityPostgresOptions));
-
-            healthChecksBuilder.AddNpgSql(
-                identityPostgresOptions.ConnectionString,
-                name: "Identity-Module-Postgres-Check",
-                tags: new[] {"identity-postgres"});
-        });
-
         return services;
     }
 }

@@ -1,6 +1,5 @@
 using Asp.Versioning.Conventions;
 using BuildingBlocks.Abstractions.CQRS.Query;
-using BuildingBlocks.Abstractions.Web;
 using Hellang.Middleware.ProblemDetails;
 using Ytsoob.Modules.Identity.Users.Features.RegisteringUser.v1;
 

@@ -1,4 +1,4 @@
-namespace Ytsoob.Modules.Identity.UnitTests;
+namespace ECommerce.Modules.Identity.UnitTests;
 
 public class UnitTest1
 {

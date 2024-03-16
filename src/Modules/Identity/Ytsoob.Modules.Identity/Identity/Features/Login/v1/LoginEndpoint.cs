@@ -1,8 +1,6 @@
 using Asp.Versioning.Conventions;
 using BuildingBlocks.Abstractions.CQRS.Command;
-using BuildingBlocks.Abstractions.Web;
 using Hellang.Middleware.ProblemDetails;
-using Ytsoob.Modules.Identity.Users;
 
 namespace Ytsoob.Modules.Identity.Identity.Features.Login.v1;
 

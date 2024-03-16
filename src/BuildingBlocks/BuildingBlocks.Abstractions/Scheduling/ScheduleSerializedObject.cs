@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Abstractions.Scheduler;
+﻿namespace BuildingBlocks.Abstractions.Scheduling;
 
 public class ScheduleSerializedObject
 {

@@ -1,5 +1,6 @@
 using BuildingBlocks.Caching.InMemory;
 using BuildingBlocks.Core.Caching;
+using BuildingBlocks.Core.IdsGenerator;
 using BuildingBlocks.Core.Persistence.EfCore;
 using BuildingBlocks.Core.Registrations;
 using BuildingBlocks.Email;
@@ -15,6 +16,7 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        SnowFlakIdGenerator.Configure(1);
         services.AddControllersAsServices();
 
         services.AddCqrs(doMoreActions: s =>
@@ -29,10 +31,7 @@ public static partial class ServiceCollectionExtensions
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(EfTxBehavior<,>));
         });
 
-        services.AddCore(
-            configuration,
-            IdentityModuleConfiguration.ModuleName,
-            Assembly.GetExecutingAssembly());
+        services.AddCore(configuration, IdentityModuleConfiguration.ModuleName, Assembly.GetExecutingAssembly());
 
         services.AddEmailService(configuration, $"{IdentityModuleConfiguration.ModuleName}:{nameof(EmailOptions)}");
 
@@ -46,9 +45,7 @@ public static partial class ServiceCollectionExtensions
         services.AddInMemoryCommandScheduler();
         services.AddInMemoryBroker(configuration);
 
-
-        services.AddCustomInMemoryCache(configuration)
-            .AddCachingRequestPolicies(Assembly.GetExecutingAssembly());
+        services.AddCustomInMemoryCache(configuration).AddCachingRequestPolicies(Assembly.GetExecutingAssembly());
 
         services.AddSingleton<ILoggerFactory>(new Serilog.Extensions.Logging.SerilogLoggerFactory());
 

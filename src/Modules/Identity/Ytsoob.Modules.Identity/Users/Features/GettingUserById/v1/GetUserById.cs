@@ -4,7 +4,7 @@ using BuildingBlocks.Abstractions.CQRS.Query;
 using BuildingBlocks.Core.Exception;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
+using Ytsoob.Modules.Identity.Identity.Exceptions;
 using Ytsoob.Modules.Identity.Shared.Extensions;
 using Ytsoob.Modules.Identity.Shared.Models;
 using Ytsoob.Modules.Identity.Users.Dtos.v1;

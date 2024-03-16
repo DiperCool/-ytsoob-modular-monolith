@@ -6,9 +6,9 @@ using BuildingBlocks.Core.Exception.Types;
 using BuildingBlocks.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Ytsoob.Modules.Identity.Identity.Exceptions;
 using Ytsoob.Modules.Identity.Shared.Data;
 using Ytsoob.Modules.Identity.Shared.Models;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
 
 namespace Ytsoob.Modules.Identity.Identity.Features.SendingEmailVerificationCode.v1;
 

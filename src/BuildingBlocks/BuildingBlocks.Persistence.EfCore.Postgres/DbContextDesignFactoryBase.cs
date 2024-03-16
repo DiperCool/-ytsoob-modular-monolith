@@ -1,5 +1,3 @@
-using BuildingBlocks.Core.Extensions;
-using BuildingBlocks.Core.Web;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

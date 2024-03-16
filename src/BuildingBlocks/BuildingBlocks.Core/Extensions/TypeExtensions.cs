@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using BuildingBlocks.Abstractions.CQRS.Event;
 using BuildingBlocks.Abstractions.CQRS.Event.Internal;
-using BuildingBlocks.Abstractions.Scheduler;
+using BuildingBlocks.Abstractions.Scheduling;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BuildingBlocks.Core.Extensions;

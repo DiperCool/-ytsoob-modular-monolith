@@ -8,7 +8,6 @@ using Ytsoob.Modules.Identity.Identity.Exceptions;
 using Ytsoob.Modules.Identity.Identity.Features.GeneratingJwtToken.v1;
 using Ytsoob.Modules.Identity.Identity.Features.GeneratingRefreshToken.v1;
 using Ytsoob.Modules.Identity.Shared.Models;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace Ytsoob.Modules.Identity.Identity.Features.RefreshingToken.v1;

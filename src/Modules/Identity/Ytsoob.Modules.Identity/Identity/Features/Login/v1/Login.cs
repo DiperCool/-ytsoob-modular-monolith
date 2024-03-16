@@ -14,7 +14,6 @@ using Ytsoob.Modules.Identity.Identity.Features.GeneratingJwtToken.v1;
 using Ytsoob.Modules.Identity.Identity.Features.GeneratingRefreshToken.v1;
 using Ytsoob.Modules.Identity.Shared.Data;
 using Ytsoob.Modules.Identity.Shared.Models;
-using Ytsoob.Modules.Identity.Shared.Exceptions;
 
 namespace Ytsoob.Modules.Identity.Identity.Features.Login.v1;
 

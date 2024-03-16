@@ -1,4 +1,4 @@
-using BuildingBlocks.Abstractions.Scheduler;
+using BuildingBlocks.Abstractions.Scheduling;
 using BuildingBlocks.Core.Extensions;
 using MediatR;
 using Newtonsoft.Json;

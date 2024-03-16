@@ -19,9 +19,10 @@ public static class CQRSRegistrationExtensions
         this IServiceCollection services,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
         Action<IServiceCollection>? doMoreActions = null,
-        params Assembly[] assemblies)
+        params Assembly[] assemblies
+    )
     {
-        var assembliesToScan = assemblies.Any() ? assemblies : new[] {Assembly.GetCallingAssembly()};
+        var assembliesToScan = assemblies.Any() ? assemblies : new[] { Assembly.GetCallingAssembly() };
 
         services.AddMediatR(
             assembliesToScan,
@@ -39,9 +40,11 @@ public static class CQRSRegistrationExtensions
                         x.AsSingleton();
                         break;
                 }
-            });
+            }
+        );
 
-        services.Add<ICommandProcessor, CommandProcessor>(serviceLifetime)
+        services
+            .Add<ICommandProcessor, CommandProcessor>(serviceLifetime)
             .Add<IQueryProcessor, QueryProcessor>(serviceLifetime)
             .Add<IEventProcessor, EventProcessor>(serviceLifetime)
             .Add<IScheduler, NullScheduler>(serviceLifetime)
@@ -60,16 +63,17 @@ public static class CQRSRegistrationExtensions
 
     private static void RegisterEventMappers(IServiceCollection services, params Assembly[] assembliesToScan)
     {
-        services.Scan(scan => scan
-            .FromAssemblies(assembliesToScan.Any() ? assembliesToScan : AppDomain.CurrentDomain.GetAssemblies())
-            .AddClasses(classes => classes.AssignableTo(typeof(IEventMapper)), false)
-            .AsImplementedInterfaces()
-            .WithSingletonLifetime()
-            .AddClasses(classes => classes.AssignableTo(typeof(IIntegrationEventMapper)), false)
-            .AsImplementedInterfaces()
-            .WithSingletonLifetime()
-            .AddClasses(classes => classes.AssignableTo(typeof(IIDomainNotificationEventMapper)), false)
-            .AsImplementedInterfaces()
-            .WithSingletonLifetime());
+        services.Scan(scan =>
+            scan.FromAssemblies(assembliesToScan.Any() ? assembliesToScan : AppDomain.CurrentDomain.GetAssemblies())
+                .AddClasses(classes => classes.AssignableTo(typeof(IEventMapper)), false)
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(IIntegrationEventMapper)), false)
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(IIDomainNotificationEventMapper)), false)
+                .AsImplementedInterfaces()
+                .WithSingletonLifetime()
+        );
     }
 }

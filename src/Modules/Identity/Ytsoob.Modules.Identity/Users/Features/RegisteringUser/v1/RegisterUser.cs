@@ -41,7 +41,6 @@ internal class RegisterUserValidator : AbstractValidator<RegisterUser>
         RuleFor(v => v.UserName).NotEmpty().WithMessage("UserName is required.");
         RuleFor(v => v.Phone).NotEmpty().WithMessage("Phone is required.");
 
-
         RuleFor(v => v.Password).NotEmpty().WithMessage("Password is required.");
 
         RuleFor(v => v.ConfirmPassword)
@@ -55,10 +54,9 @@ internal class RegisterUserValidator : AbstractValidator<RegisterUser>
                 {
                     if (
                         roles != null
-                        && !roles.All(
-                            x =>
-                                x.Contains(IdentityConstants.Role.Admin, StringComparison.Ordinal)
-                                || x.Contains(IdentityConstants.Role.User, StringComparison.Ordinal)
+                        && !roles.All(x =>
+                            x.Contains(IdentityConstants.Role.Admin, StringComparison.Ordinal)
+                            || x.Contains(IdentityConstants.Role.User, StringComparison.Ordinal)
                         )
                     )
                     {

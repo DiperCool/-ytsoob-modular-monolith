@@ -18,7 +18,8 @@ public static class CoreRegistrationExtensions
         this IServiceCollection services,
         IConfiguration configuration,
         string? rootSectionName = null,
-        params Assembly[] assembliesToScan)
+        params Assembly[] assembliesToScan
+    )
     {
         var systemInfo = MachineInstanceInfo.New();
 
@@ -49,10 +50,10 @@ public static class CoreRegistrationExtensions
         return services;
     }
 
-
     private static void AddDefaultSerializer(
         IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        ServiceLifetime lifetime = ServiceLifetime.Transient
+    )
     {
         services.Add<ISerializer, DefaultSerializer>(lifetime);
         services.Add<IMessageSerializer, DefaultMessageSerializer>(lifetime);

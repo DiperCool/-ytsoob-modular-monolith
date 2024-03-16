@@ -4,7 +4,7 @@
 // using BuildingBlocks.Abstractions.Web.Module;
 // using ECommerce.Modules.Customers;
 // using ECommerce.Modules.Customers.Users.Features.RegisteringUser.Events.External;
-// using Ytsoob.Modules.Identity.Users.Features.RegisteringUser;
+// using Ytsoob.Modules.Ytsoobers.Users.Features.RegisteringUser;
 // using Humanizer;
 // using Hypothesist;
 // using Microsoft.Extensions.DependencyInjection;

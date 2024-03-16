@@ -20,7 +20,8 @@ public class EfTxBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TRe
         IDbFacadeResolver dbFacadeResolver,
         ILogger<EfTxBehavior<TRequest, TResponse>> logger,
         IDomainEventPublisher domainEventPublisher,
-        IDomainEventContext domainEventContext)
+        IDomainEventContext domainEventContext
+    )
     {
         _dbFacadeResolver = dbFacadeResolver;
         _logger = logger;
@@ -31,19 +32,23 @@ public class EfTxBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TRe
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
-        if (request is not ITxRequest) return await next();
+        if (request is not ITxRequest)
+            return await next();
 
         _logger.LogInformation(
             "{Prefix} Handled command {MediatrRequest}",
             nameof(EfTxBehavior<TRequest, TResponse>),
-            typeof(TRequest).FullName);
+            typeof(TRequest).FullName
+        );
 
         _logger.LogInformation(
             "{Prefix} Open the transaction for {MediatrRequest}",
             nameof(EfTxBehavior<TRequest, TResponse>),
-            typeof(TRequest).FullName);
+            typeof(TRequest).FullName
+        );
 
         var strategy = _dbFacadeResolver.Database.CreateExecutionStrategy();
 
@@ -52,8 +57,9 @@ public class EfTxBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TRe
             // https://www.thinktecture.com/en/entity-framework-core/use-transactionscope-with-caution-in-2-1/
             // https://github.com/dotnet/efcore/issues/6233#issuecomment-242693262
             var isInnerTransaction = _dbFacadeResolver.Database.CurrentTransaction is not null;
-            var transaction = _dbFacadeResolver.Database.CurrentTransaction ??
-                              await _dbFacadeResolver.Database.BeginTransactionAsync(cancellationToken);
+            var transaction =
+                _dbFacadeResolver.Database.CurrentTransaction
+                ?? await _dbFacadeResolver.Database.BeginTransactionAsync(cancellationToken);
             try
             {
                 var response = await next().ConfigureAwait(false);
@@ -61,7 +67,8 @@ public class EfTxBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TRe
                 _logger.LogInformation(
                     "{Prefix} Executed the {MediatrRequest} request",
                     nameof(EfTxBehavior<TRequest, TResponse>),
-                    typeof(TRequest).FullName);
+                    typeof(TRequest).FullName
+                );
 
                 var domainEvents = _domainEventContext.GetAllUncommittedEvents();
                 await _domainEventPublisher.PublishAsync(domainEvents.ToArray(), cancellationToken);
@@ -75,6 +82,8 @@ public class EfTxBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TRe
             }
             catch (System.Exception e)
             {
+                _logger.LogError(e.Message);
+
                 if (!isInnerTransaction)
                     await transaction.RollbackAsync(cancellationToken);
                 throw;
