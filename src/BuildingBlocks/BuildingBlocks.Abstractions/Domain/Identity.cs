@@ -2,11 +2,9 @@ namespace BuildingBlocks.Abstractions.Domain;
 
 public abstract record Identity<TId>
 {
-    protected Identity(TId value) => Value = value;
-    public TId Value { get; protected set; }
+    public TId Value { get; init; } = default!;
 
-    public static implicit operator TId(Identity<TId> identityId)
-        => identityId.Value;
+    public static implicit operator TId(Identity<TId> identityId) => identityId.Value;
 
     public override string ToString()
     {
@@ -15,13 +13,8 @@ public abstract record Identity<TId>
 
     public string IdAsString()
     {
-        return $"{GetType().Name} [Id={Value}]";
+        return $"{GetType().Name} [InternalCommandId={Value}]";
     }
 }
 
-public abstract record Identity : Identity<long>
-{
-    protected Identity(long value) : base(value)
-    {
-    }
-}
+public abstract record Identity : Identity<long>;

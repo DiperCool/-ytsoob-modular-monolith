@@ -1,16 +1,11 @@
 using Asp.Versioning.Conventions;
-using AutoMapper;
 using BuildingBlocks.Abstractions.CQRS.Command;
-using BuildingBlocks.Abstractions.CQRS.Query;
-using BuildingBlocks.Abstractions.Web.MinimalApi;
 using BuildingBlocks.Security.Jwt;
 using Hellang.Middleware.ProblemDetails;
 using Humanizer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Ytsoob.Modules.Ytsoobers.Profiles.Dtos.v1;
-using Ytsoob.Modules.Ytsoobers.Profiles.Features.GettingProfile.v1.GetProfile;
 using Ytsoob.Modules.Ytsoobers.Ytsoobers.ValueObjects;
 
 namespace Ytsoob.Modules.Ytsoobers.Profiles.Features.UpdatingProfile.v1.UpdateProfile;

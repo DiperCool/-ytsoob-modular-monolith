@@ -1,5 +1,4 @@
-using BuildingBlocks.Caching.InMemory;
-using BuildingBlocks.Core.Caching;
+using BuildingBlocks.Caching.Behaviours;
 using BuildingBlocks.Core.IdsGenerator;
 using BuildingBlocks.Core.Persistence.EfCore;
 using BuildingBlocks.Core.Registrations;
@@ -44,8 +43,6 @@ public static partial class ServiceCollectionExtensions
         services.AddInMemoryMessagePersistence();
         services.AddInMemoryCommandScheduler();
         services.AddInMemoryBroker(configuration);
-
-        services.AddCustomInMemoryCache(configuration).AddCachingRequestPolicies(Assembly.GetExecutingAssembly());
 
         services.AddSingleton<ILoggerFactory>(new Serilog.Extensions.Logging.SerilogLoggerFactory());
 

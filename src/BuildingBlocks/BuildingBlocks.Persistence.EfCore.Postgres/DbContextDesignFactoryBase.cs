@@ -1,5 +1,7 @@
+using BuildingBlocks.Core.Persistence.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuildingBlocks.Persistence.EfCore.Postgres;
 
@@ -18,7 +20,6 @@ public abstract class DbContextDesignFactoryBase<TDbContext> : IDesignTimeDbCont
         Console.WriteLine($"BaseDirectory: {AppContext.BaseDirectory}");
         Console.WriteLine($"Postgres Connection String: {_connectionString}");
 
-
         var optionsBuilder = new DbContextOptionsBuilder<TDbContext>()
             .UseNpgsql(
                 _connectionString,
@@ -27,9 +28,10 @@ public abstract class DbContextDesignFactoryBase<TDbContext> : IDesignTimeDbCont
                     sqlOptions.MigrationsAssembly(GetType().Assembly.FullName);
                     sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
                 }
-            ).UseSnakeCaseNamingConvention();
+            )
+            .UseSnakeCaseNamingConvention()
+            .ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector<long>>();
 
-        Console.WriteLine(_connectionString);
         return (TDbContext)Activator.CreateInstance(typeof(TDbContext), optionsBuilder.Options);
     }
 }

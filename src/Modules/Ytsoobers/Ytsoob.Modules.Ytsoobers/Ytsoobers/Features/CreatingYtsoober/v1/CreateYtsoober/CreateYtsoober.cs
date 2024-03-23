@@ -8,7 +8,7 @@ using Ytsoob.Modules.Ytsoobers.Ytsoobers.ValueObjects;
 
 namespace Ytsoob.Modules.Ytsoobers.Ytsoobers.Features.CreatingYtsoober.v1.CreateYtsoober;
 
-public record CreateYtsoober(long YtsooberId, Guid IdentityId, string Username, string Email) : ITxCreateCommand;
+public record CreateYtsoober(YtsooberId YtsooberId, Guid IdentityId, string Username, string Email) : ITxCreateCommand;
 
 public class CreateYtsooberHandler : ICommandHandler<CreateYtsoober>
 {

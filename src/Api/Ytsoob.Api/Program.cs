@@ -17,6 +17,7 @@ using Ytsoob.Api;
 using Ytsoob.Api.Extensions.ApplicationBuilderExtensions;
 using Ytsoob.Api.Extensions.ServiceCollectionExtensions;
 using Ytsoob.Modules.Identity;
+using Ytsoob.Modules.Posts;
 using Ytsoob.Modules.Ytsoobers;
 
 // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis
@@ -105,7 +106,9 @@ static void RegisterServices(WebApplicationBuilder builder)
     builder.Services.AddCompression();
 
     builder.Services.AddCustomVersioning();
-    builder.AddCustomSwagger(new[] { typeof(IdentityRoot).Assembly, typeof(YtsoobersRoot).Assembly, });
+    builder.AddCustomSwagger(
+        new[] { typeof(IdentityRoot).Assembly, typeof(YtsoobersRoot).Assembly, typeof(PostsRoot).Assembly, }
+    );
 
     builder.Services.AddCustomJwtAuthentication(builder.Configuration);
     builder.Services.AddCustomAuthorization(

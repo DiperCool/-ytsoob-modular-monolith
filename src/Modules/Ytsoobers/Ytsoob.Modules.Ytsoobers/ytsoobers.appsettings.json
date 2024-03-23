@@ -16,7 +16,11 @@
     },
     "MessagePersistenceOptions": {
       "Interval": 30
+    },
+    "MinioOptions": {
+      "Uri": "localhost:9000",
+      "Username": "access",
+      "Password": "secret1234"
     }
   }
 }
-

@@ -3,16 +3,13 @@ using Asp.Versioning.Conventions;
 using AutoMapper;
 using BuildingBlocks.Abstractions.CQRS.Query;
 using BuildingBlocks.Abstractions.Web;
-using BuildingBlocks.Abstractions.Web.MinimalApi;
 using BuildingBlocks.Security.Jwt;
-using BuildingBlocks.Web;
 using Hellang.Middleware.ProblemDetails;
 using Humanizer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Annotations;
 using Ytsoob.Modules.Ytsoobers.Profiles.Dtos.v1;
 using Ytsoob.Modules.Ytsoobers.Shared.Data;
 using Ytsoob.Modules.Ytsoobers.Ytsoobers.Models;
@@ -45,8 +42,9 @@ public static class GetProfileEndpoint
     {
         return await gatewayProcessor.ExecuteScopeAsync(async sp =>
         {
+            var currentUser = sp.GetRequiredService<ICurrentUserService>();
             var result = await sp.GetRequiredService<IQueryProcessor>()
-                .SendAsync(new GetProfile(YtsooberId.Of(1)), cancellationToken);
+                .SendAsync(new GetProfile(YtsooberId.Of(currentUser.YtsooberId)), cancellationToken);
 
             return Results.Ok(result);
         });

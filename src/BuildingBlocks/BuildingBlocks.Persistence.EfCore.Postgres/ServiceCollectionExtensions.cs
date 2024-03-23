@@ -10,6 +10,7 @@ using BuildingBlocks.Core.Persistence.EfCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -25,7 +26,8 @@ public static class ServiceCollectionExtensions
         string optionSection = nameof(PostgresOptions),
         Assembly? migrationAssembly = null,
         Action<PostgresOptions>? configurator = null,
-        Action<DbContextOptionsBuilder>? builder = null)
+        Action<DbContextOptionsBuilder>? builder = null
+    )
         where TDbContext : DbContext, IDbFacadeResolver, IDomainEventContext
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -41,15 +43,24 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<TDbContext>(
             options =>
             {
-                options.UseNpgsql(config.ConnectionString, sqlOptions =>
-                {
-                    sqlOptions.MigrationsAssembly((migrationAssembly ?? typeof(TDbContext).Assembly).GetName().Name);
-                    sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-                }).UseSnakeCaseNamingConvention();
+                options
+                    .UseNpgsql(
+                        config.ConnectionString,
+                        sqlOptions =>
+                        {
+                            sqlOptions.MigrationsAssembly(
+                                (migrationAssembly ?? typeof(TDbContext).Assembly).GetName().Name
+                            );
+                            sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                        }
+                    )
+                    .UseSnakeCaseNamingConvention();
+                options.ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector<long>>();
 
                 builder?.Invoke(options);
             },
-            ServiceLifetime.Scoped);
+            ServiceLifetime.Scoped
+        );
 
         services.AddScoped<IConnectionFactory, NpgsqlConnectionFactory>();
 
@@ -62,14 +73,17 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddPostgresCustomRepository(
         this IServiceCollection services,
-        Type customRepositoryType)
+        Type customRepositoryType
+    )
     {
-        services.Scan(scan => scan
-            .FromAssembliesOf(customRepositoryType)
-            .AddClasses(classes =>
-                classes.AssignableTo(customRepositoryType)).As(typeof(IRepository<,>)).WithScopedLifetime()
-            .AddClasses(classes =>
-                classes.AssignableTo(customRepositoryType)).As(typeof(IPageRepository<>)).WithScopedLifetime()
+        services.Scan(scan =>
+            scan.FromAssembliesOf(customRepositoryType)
+                .AddClasses(classes => classes.AssignableTo(customRepositoryType))
+                .As(typeof(IRepository<,>))
+                .WithScopedLifetime()
+                .AddClasses(classes => classes.AssignableTo(customRepositoryType))
+                .As(typeof(IPageRepository<>))
+                .WithScopedLifetime()
         );
 
         return services;
@@ -77,7 +91,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddPostgresRepository<TEntity, TKey, TRepository>(
         this IServiceCollection services,
-        ServiceLifetime lifeTime = ServiceLifetime.Scoped)
+        ServiceLifetime lifeTime = ServiceLifetime.Scoped
+    )
         where TEntity : class, IAggregate<TKey>
         where TRepository : class, IRepository<TEntity, TKey>
     {
@@ -87,7 +102,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddUnitOfWork<TContext>(
         this IServiceCollection services,
         ServiceLifetime lifeTime = ServiceLifetime.Scoped,
-        bool registerGeneric = false)
+        bool registerGeneric = false
+    )
         where TContext : EfDbContextBase
     {
         if (registerGeneric)
@@ -98,17 +114,18 @@ public static class ServiceCollectionExtensions
         return services.RegisterService<IEfUnitOfWork<TContext>, EfUnitOfWork<TContext>>(lifeTime);
     }
 
-
     public static void MigrateDataFromScript(this MigrationBuilder migrationBuilder)
     {
         var assembly = Assembly.GetCallingAssembly();
         var files = assembly.GetManifestResourceNames();
         var filePrefix = $"{assembly.GetName().Name}.Data.Scripts.";
 
-        foreach (var file in files
-                     .Where(f => f.StartsWith(filePrefix) && f.EndsWith(".sql"))
-                     .Select(f => new {PhysicalFile = f, LogicalFile = f.Replace(filePrefix, string.Empty)})
-                     .OrderBy(f => f.LogicalFile))
+        foreach (
+            var file in files
+                .Where(f => f.StartsWith(filePrefix) && f.EndsWith(".sql"))
+                .Select(f => new { PhysicalFile = f, LogicalFile = f.Replace(filePrefix, string.Empty) })
+                .OrderBy(f => f.LogicalFile)
+        )
         {
             using var stream = assembly.GetManifestResourceStream(file.PhysicalFile);
             using var reader = new StreamReader(stream!);
@@ -124,7 +141,8 @@ public static class ServiceCollectionExtensions
     public static async Task DoDbMigrationAsync(
         this IApplicationBuilder app,
         ILogger logger,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var scope = app.ApplicationServices.CreateAsyncScope();
         var dbFacadeResolver = scope.ServiceProvider.GetService<IDbFacadeResolver>();
@@ -138,8 +156,9 @@ public static class ServiceCollectionExtensions
                 throw new System.Exception("Couldn't connect database.");
             }
 
-            var migrations =
-                await dbFacadeResolver?.Database.GetPendingMigrationsAsync(cancellationToken: cancellationToken)!;
+            var migrations = await dbFacadeResolver?.Database.GetPendingMigrationsAsync(
+                cancellationToken: cancellationToken
+            )!;
             if (migrations.Any())
             {
                 await dbFacadeResolver?.Database.MigrateAsync(cancellationToken: cancellationToken)!;
@@ -149,27 +168,31 @@ public static class ServiceCollectionExtensions
 
         static AsyncRetryPolicy CreatePolicy(int retries, ILogger logger, string prefix)
         {
-            return Policy.Handle<System.Exception>().WaitAndRetryAsync(
-                retries,
-                retry => TimeSpan.FromSeconds(15),
-                (exception, timeSpan, retry, ctx) =>
-                {
-                    logger.LogWarning(
-                        exception,
-                        "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}",
-                        prefix,
-                        exception.GetType().Name,
-                        exception.Message,
-                        retry,
-                        retries);
-                }
-            );
+            return Policy
+                .Handle<System.Exception>()
+                .WaitAndRetryAsync(
+                    retries,
+                    retry => TimeSpan.FromSeconds(15),
+                    (exception, timeSpan, retry, ctx) =>
+                    {
+                        logger.LogWarning(
+                            exception,
+                            "[{Prefix}] Exception {ExceptionType} with message {Message} detected on attempt {Retry} of {Retries}",
+                            prefix,
+                            exception.GetType().Name,
+                            exception.Message,
+                            retry,
+                            retries
+                        );
+                    }
+                );
         }
     }
 
     private static IServiceCollection RegisterService<TService, TImplementation>(
         this IServiceCollection services,
-        ServiceLifetime lifeTime = ServiceLifetime.Scoped)
+        ServiceLifetime lifeTime = ServiceLifetime.Scoped
+    )
         where TService : class
         where TImplementation : class, TService
     {

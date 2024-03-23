@@ -25,9 +25,11 @@ public static class ReflectionUtilities
     private static IEnumerable<Type> GetAllTypesImplementingInterface<TInterface>(Assembly? assembly = null)
     {
         var inputAssembly = assembly ?? Assembly.GetExecutingAssembly();
-        return inputAssembly.GetTypes()
-            .Where(type => typeof(TInterface).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract &&
-                           type.IsClass);
+        return inputAssembly
+            .GetTypes()
+            .Where(type =>
+                typeof(TInterface).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && type.IsClass
+            );
     }
 
     public static IEnumerable<string?> GetPropertyNames<T>(params Expression<Func<T, object>>[] propertyExpressions)
@@ -63,16 +65,54 @@ public static class ReflectionUtilities
         return retVal;
     }
 
+    /// <summary>
+    /// Get All referenced assemblies of root assembly(EntryAssembly if not provide) and loading them explicitly because assemblies will load lazily based on their dependent assembly code use in dependency graph (it is possible to get ReflectionTypeLoadException, because some dependent type assembly are lazy and not loaded yet).
+    /// Ref: https://stackoverflow.com/a/10253634/581476, https://www.davidguida.net/how-to-find-all-application-assemblies, https://dotnetcoretutorials.com/2020/07/03/getting-assemblies-is-harder-than-you-think-in-c/
+    /// </summary>
+    /// <param name="rootAssembly"></param>
+    /// <returns></returns>
+    public static IReadOnlyList<Assembly> GetReferencedAssemblies(Assembly? rootAssembly)
+    {
+        var visited = new HashSet<string>();
+        var queue = new Queue<Assembly?>();
+        var listResult = new List<Assembly>();
+
+        var root = rootAssembly ?? Assembly.GetEntryAssembly();
+        queue.Enqueue(root);
+
+        while (queue.Any())
+        {
+            var asm = queue.Dequeue();
+
+            if (asm == null)
+                break;
+
+            listResult.Add(asm);
+
+            foreach (var reference in asm.GetReferencedAssemblies())
+            {
+                if (!visited.Contains(reference.FullName))
+                {
+                    // `Load` will add assembly into the `application domain` of the caller. loading assemblies explicitly to AppDomain, because assemblies are loaded lazily
+                    // https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.load
+                    queue.Enqueue(Assembly.Load(reference));
+                    visited.Add(reference.FullName);
+                }
+            }
+        }
+
+        return listResult.Distinct().ToList().AsReadOnly();
+    }
+
     public static Type? GetTypeFromAnyReferencingAssembly(string typeName)
     {
-        var referencedAssemblies = Assembly.GetEntryAssembly()?
-            .GetReferencedAssemblies()
-            .Select(a => a.FullName);
+        var referencedAssemblies = Assembly.GetEntryAssembly()?.GetReferencedAssemblies().Select(a => a.FullName);
 
         if (referencedAssemblies == null)
             return null;
 
-        return AppDomain.CurrentDomain.GetAssemblies()
+        return AppDomain
+            .CurrentDomain.GetAssemblies()
             .Where(a => referencedAssemblies.Contains(a.FullName))
             .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
             .FirstOrDefault();
@@ -80,14 +120,14 @@ public static class ReflectionUtilities
 
     public static Type? GetFirstMatchingTypeFromCurrentDomainAssemblies(string typeName)
     {
-        return AppDomain.CurrentDomain.GetAssemblies()
+        return AppDomain
+            .CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes().Where(x => x.FullName == typeName || x.Name == typeName))
             .FirstOrDefault();
     }
 
     public static Type? GetFirstMatchingTypeFromAssembly(string typeName, Assembly assembly)
     {
-        return assembly.GetTypes()
-            .FirstOrDefault(x => x.FullName == typeName || x.Name == typeName);
+        return assembly.GetTypes().FirstOrDefault(x => x.FullName == typeName || x.Name == typeName);
     }
 }

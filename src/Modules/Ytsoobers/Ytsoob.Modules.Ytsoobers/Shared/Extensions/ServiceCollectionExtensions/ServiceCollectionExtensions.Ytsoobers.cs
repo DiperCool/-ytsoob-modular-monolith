@@ -1,6 +1,4 @@
 using System.Reflection;
-using BuildingBlocks.Caching.InMemory;
-using BuildingBlocks.Core.Caching;
 using BuildingBlocks.Core.IdsGenerator;
 using BuildingBlocks.Core.Persistence.EfCore;
 using BuildingBlocks.Core.Registrations;
@@ -30,10 +28,7 @@ public static partial class ServiceCollectionExtensions
             s.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>))
                 .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamRequestValidationBehavior<,>))
                 .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamLoggingBehavior<,>))
-                .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamCachingBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
-                .AddScoped(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>))
-                .AddScoped(typeof(IPipelineBehavior<,>), typeof(InvalidateCachingBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(EfTxBehavior<,>));
         });
 
@@ -48,8 +43,6 @@ public static partial class ServiceCollectionExtensions
         services.AddInMemoryMessagePersistence();
         services.AddInMemoryCommandScheduler();
         services.AddInMemoryBroker(configuration);
-
-        services.AddCustomInMemoryCache(configuration).AddCachingRequestPolicies(Assembly.GetExecutingAssembly());
 
         services.AddSingleton<ILoggerFactory>(new Serilog.Extensions.Logging.SerilogLoggerFactory());
         services.AddPostgresDbContext<YtsoobersDbContext>(

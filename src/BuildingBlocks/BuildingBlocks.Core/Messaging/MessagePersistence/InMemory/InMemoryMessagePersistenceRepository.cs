@@ -10,9 +10,7 @@ public class InMemoryMessagePersistenceRepository : IMessagePersistenceRepositor
 {
     private static readonly ConcurrentDictionary<Guid, StoreMessage> _messages = new();
 
-    public InMemoryMessagePersistenceRepository()
-    {
-    }
+    public InMemoryMessagePersistenceRepository() { }
 
     public Task AddAsync(StoreMessage storeMessage, CancellationToken cancellationToken = default)
     {
@@ -32,7 +30,8 @@ public class InMemoryMessagePersistenceRepository : IMessagePersistenceRepositor
 
     public Task<IReadOnlyList<StoreMessage>> GetByFilterAsync(
         Expression<Func<StoreMessage, bool>> predicate,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.Against.Null(predicate, nameof(predicate));
 

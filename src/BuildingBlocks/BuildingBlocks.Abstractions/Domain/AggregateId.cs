@@ -4,23 +4,26 @@ namespace BuildingBlocks.Abstractions.Domain;
 
 public record AggregateId<T> : Identity<T>
 {
-    public AggregateId(T value)
-        : base(value) { }
+    // EF
+    protected AggregateId(T value)
+    {
+        Value = value;
+    }
 
-    public static implicit operator T(AggregateId<T> id) => Guard.Against.Null(id.Value, nameof(id.Value));
+    public static implicit operator T(AggregateId<T> id) => id.Value;
 
-    public static implicit operator AggregateId<T>(T id) => new(id);
+    // validations should be placed here instead of constructor
+    public static AggregateId<T> CreateAggregateId(T id) => new(id);
 }
 
 public record AggregateId : AggregateId<long>
 {
-    public AggregateId(long value)
-        : base(value)
-    {
-        Guard.Against.NegativeOrZero(value, nameof(value));
-    }
+    // EF
+    protected AggregateId(long value)
+        : base(value) { }
 
-    public static implicit operator long(AggregateId id) => Guard.Against.Null(id.Value, nameof(id.Value));
+    // validations should be placed here instead of constructor
+    public static new AggregateId CreateAggregateId(long value) => new(Guard.Against.NegativeOrZero(value));
 
-    public static implicit operator AggregateId(long id) => new(id);
+    public static implicit operator long(AggregateId id) => id.Value;
 }
