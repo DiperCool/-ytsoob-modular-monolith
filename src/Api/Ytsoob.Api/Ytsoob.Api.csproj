@@ -6,6 +6,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\Identity\Ytsoob.Modules.Identity\Ytsoob.Modules.Identity.csproj" />
     <ProjectReference Include="..\..\Modules\Posts\Ytsoob.Modules.Posts\Ytsoob.Modules.Posts.csproj" />
+    <ProjectReference Include="..\..\Modules\Subscriptions\Ytsoob.Modules.Subscriptions\Ytsoob.Modules.Subscriptions.csproj" />
     <ProjectReference Include="..\..\Modules\Ytsoobers\Ytsoob.Modules.Ytsoobers\Ytsoob.Modules.Ytsoobers.csproj" />
   </ItemGroup>
+ 
 </Project>

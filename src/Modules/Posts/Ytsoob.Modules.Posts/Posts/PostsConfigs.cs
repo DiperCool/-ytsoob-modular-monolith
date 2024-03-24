@@ -13,7 +13,7 @@ namespace Ytsoob.Modules.Posts.Posts;
 internal static class PostsConfigs
 {
     public const string Tag = "Posts";
-    public const string PostsPrefixUri = $"{PostsModuleConfiguration.PostsModulePrefixUri}/posts";
+    public const string PostsPrefixUri = $"{PostsModuleConfiguration.PostsModulePrefixUri}";
     public static ApiVersionSet VersionSet { get; private set; } = default!;
 
     internal static IEndpointRouteBuilder MapPostsEndpoints(this IEndpointRouteBuilder endpoints)

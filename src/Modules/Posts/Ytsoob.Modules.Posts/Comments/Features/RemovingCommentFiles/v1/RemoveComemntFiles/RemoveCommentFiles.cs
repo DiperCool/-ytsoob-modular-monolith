@@ -1,6 +1,4 @@
-using Ardalis.GuardClauses;
 using Asp.Versioning.Conventions;
-using AutoMapper;
 using BuildingBlocks.Abstractions.CQRS.Command;
 using BuildingBlocks.Abstractions.Web;
 using BuildingBlocks.Security.Jwt;
@@ -16,7 +14,7 @@ using Ytsoob.Modules.Posts.Comments.Models;
 using Ytsoob.Modules.Posts.Shared.Contracts;
 using Ytsoob.Modules.Posts.Shared.Data;
 
-namespace Ytsoob.Modules.Posts.Comments.Features.RemovingFiles.v1.RemoveFiles;
+namespace Ytsoob.Modules.Posts.Comments.Features.RemovingCommentFiles.v1.RemoveComemntFiles;
 
 public record RemoveCommentFiles(long CommentId, IEnumerable<string> Files) : ITxUpdateCommand;
 

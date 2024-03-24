@@ -7,7 +7,7 @@ using Ytsoob.Modules.Posts.Comments.Features.AddingReaction.v1.AddReaction;
 using Ytsoob.Modules.Posts.Comments.Features.GettingComments.v1.GetComments;
 using Ytsoob.Modules.Posts.Comments.Features.GettingRepliedComments.v1.GetRepliedComments;
 using Ytsoob.Modules.Posts.Comments.Features.RemovingComment.v1.RemoveComment;
-using Ytsoob.Modules.Posts.Comments.Features.RemovingFiles.v1.RemoveFiles;
+using Ytsoob.Modules.Posts.Comments.Features.RemovingCommentFiles.v1.RemoveComemntFiles;
 using Ytsoob.Modules.Posts.Comments.Features.RemovingReaction.v1.RemoveReaction;
 using Ytsoob.Modules.Posts.Comments.Features.ReplyComment.v1.ReplyComment;
 using Ytsoob.Modules.Posts.Comments.Features.UpdatingComment.v1.UpdateComment;

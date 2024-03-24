@@ -118,6 +118,7 @@ static void RegisterServices(WebApplicationBuilder builder)
             new(ApiConstants.Role.User, new List<string> { ApiConstants.Role.User })
         }
     );
+    builder.Services.AddMinimalEndpoints();
 }
 
 static async Task ConfigureApplication(WebApplication app)
@@ -142,10 +143,11 @@ static async Task ConfigureApplication(WebApplication app)
     /*----------------- Module Routes Setup ------------------*/
     app.MapModulesEndpoints();
 
-    // automatic discover minimal endpoints
-    app.MapEndpoints();
+    app.MapMinimalEndpoints();
 
-    app.MapGet("/", (HttpContext _) => "ECommerce Modular Monolith Api.").ExcludeFromDescription();
+    // automatic discover minimal endpoints
+
+    app.MapGet("/", (HttpContext _) => "Ytsoob Modular Monolith Api.").ExcludeFromDescription();
 
     if (environment.IsDevelopment() || environment.IsEnvironment("docker"))
     {

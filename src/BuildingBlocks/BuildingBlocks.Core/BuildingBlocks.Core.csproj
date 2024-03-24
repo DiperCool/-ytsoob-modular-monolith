@@ -42,6 +42,7 @@
     <PackageReference Include="System.Interactive.Async" />
     <PackageReference Include="System.Reactive" />
     <PackageReference Include="Humanizer" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Humanizer.Core" />
   </ItemGroup>
 

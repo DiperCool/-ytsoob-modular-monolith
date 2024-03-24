@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace BuildingBlocks.Core.Utils;
 
@@ -129,5 +130,17 @@ public static class ReflectionUtilities
     public static Type? GetFirstMatchingTypeFromAssembly(string typeName, Assembly assembly)
     {
         return assembly.GetTypes().FirstOrDefault(x => x.FullName == typeName || x.Name == typeName);
+    }
+
+    public static IReadOnlyList<Assembly> GetApplicationPartAssemblies(Assembly rootAssembly)
+    {
+        var rootNamespace = rootAssembly.GetName().Name!.Split('.').First();
+        var list = rootAssembly!
+            .GetCustomAttributes<ApplicationPartAttribute>()
+            .Where(x => x.AssemblyName.StartsWith(rootNamespace, StringComparison.InvariantCulture))
+            .Select(name => Assembly.Load(name.AssemblyName))
+            .Distinct();
+
+        return list.ToList().AsReadOnly();
     }
 }
