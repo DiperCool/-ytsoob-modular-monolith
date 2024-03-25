@@ -3,6 +3,7 @@ using BuildingBlocks.Abstractions.Web.Module;
 using BuildingBlocks.Core;
 using BuildingBlocks.Core.Extensions;
 using BuildingBlocks.Core.Messaging.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,15 +40,13 @@ public class YtsoobersModuleConfiguration : IModuleDefinition
         IWebHostEnvironment environment
     )
     {
+        await app.UsePostgresPersistenceMessage<YtsoobersModuleConfiguration>();
         if (environment.IsEnvironment("test") == false)
         {
             await app.ApplicationServices.StartHostedServices();
         }
 
         ServiceActivator.Configure(app.ApplicationServices);
-
-        app.SubscribeAllMessageFromAssemblyOfType<YtsoobersRoot>();
-
         await app.ApplyDatabaseMigrations(logger);
     }
 

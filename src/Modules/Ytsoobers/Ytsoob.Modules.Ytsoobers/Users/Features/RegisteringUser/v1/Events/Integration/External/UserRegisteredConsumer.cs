@@ -2,8 +2,11 @@ using BuildingBlocks.Abstractions.CQRS.Command;
 using BuildingBlocks.Abstractions.Messaging;
 using BuildingBlocks.Abstractions.Messaging.Context;
 using BuildingBlocks.Abstractions.Persistence;
+using BuildingBlocks.Abstractions.Web;
 using BuildingBlocks.Core.Messaging;
 using BuildingBlocks.Web.Module;
+using DotNetCore.CAP;
+using MediatR;
 using Ytsoob.Modules.Ytsoobers.Ytsoobers.Features.CreatingYtsoober.v1.CreateYtsoober;
 using Ytsoob.Modules.Ytsoobers.Ytsoobers.ValueObjects;
 
@@ -18,25 +21,19 @@ public record UserRegistered(
     List<string>? Roles
 ) : IntegrationEvent, ITxRequest;
 
-public class UserRegisteredConsumer : IMessageHandler<UserRegistered>
+public class UserRegisteredConsumer : ICapSubscribe
 {
-    private readonly IServiceProvider _serviceProvider;
+    private IGatewayProcessor<YtsoobersModuleConfiguration> _commandProcessor;
 
-    public UserRegisteredConsumer(IServiceProvider serviceProvider)
+    public UserRegisteredConsumer(IGatewayProcessor<YtsoobersModuleConfiguration> commandProcessor)
     {
-        _serviceProvider =
-            CompositionRootRegistry.GetByModule<YtsoobersModuleConfiguration>()?.ServiceProvider ?? serviceProvider;
+        _commandProcessor = commandProcessor;
     }
 
-    public async Task HandleAsync(
-        IConsumeContext<UserRegistered> messageContext,
-        CancellationToken cancellationToken = default
-    )
+    [CapSubscribe(nameof(UserRegistered))]
+    public async Task HandleAsync(UserRegistered userRegistered, CancellationToken cancellationToken = default)
     {
-        var userRegistered = messageContext.Message;
-        var scope = _serviceProvider.CreateScope();
-        var _commandProcessor = scope.ServiceProvider.GetRequiredService<ICommandProcessor>();
-        await _commandProcessor.SendAsync(
+        await _commandProcessor.ExecuteCommand<CreateYtsoober, Unit>(
             new CreateYtsoober(
                 YtsooberId.Of(userRegistered.YtsooberId),
                 userRegistered.IdentityId,

@@ -10,23 +10,17 @@ namespace BuildingBlocks.BlobStorage;
 
 public static class ServiceCollectionExtensions
 {
-    public static WebApplicationBuilder AddBlobStorage(this WebApplicationBuilder builder, string moduleName)
+    public static WebApplicationBuilder AddBlobStorage(this WebApplicationBuilder builder)
     {
-        builder.Services.AddBlobStorage(builder.Configuration, moduleName);
+        builder.Services.AddBlobStorage(builder.Configuration);
         return builder;
     }
 
-    public static IServiceCollection AddBlobStorage(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        string moduleName
-    )
+    public static IServiceCollection AddBlobStorage(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(provider =>
         {
-            var blobStorateConfiguration = configuration.GetOptions<MinioOptions>(
-                $"{moduleName}:{nameof(MinioOptions)}"
-            );
+            var blobStorateConfiguration = configuration.GetOptions<MinioOptions>($"{nameof(MinioOptions)}");
             var minioClient = new MinioClient()
                 .WithEndpoint(blobStorateConfiguration.Uri ?? "")
                 .WithCredentials(blobStorateConfiguration.Username, blobStorateConfiguration.Password)

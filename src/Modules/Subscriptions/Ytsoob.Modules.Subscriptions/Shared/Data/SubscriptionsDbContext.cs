@@ -9,7 +9,7 @@ namespace Ytsoob.Modules.Subscriptions.Shared.Data;
 
 public class SubscriptionsDbContext : EfDbContextBase, ISubscriptionsDbContext
 {
-    public SubscriptionsDbContext(DbContextOptions options)
+    public SubscriptionsDbContext(DbContextOptions<SubscriptionsDbContext> options)
         : base(options) { }
 
     public const string DefaultSchema = "subscriptions";
@@ -22,6 +22,6 @@ public class SubscriptionsDbContext : EfDbContextBase, ISubscriptionsDbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    public DbSet<Subscription> Subscriptions { get; }
-    public DbSet<Ytsoober> Ytsoobers { get; }
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<Ytsoober> Ytsoobers => Set<Ytsoober>();
 }

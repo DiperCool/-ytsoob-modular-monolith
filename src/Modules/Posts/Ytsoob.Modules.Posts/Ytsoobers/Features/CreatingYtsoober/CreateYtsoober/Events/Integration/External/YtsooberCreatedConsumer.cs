@@ -19,12 +19,11 @@ public record YtsooberCreatedV1(
 
 public class YtsooberCreatedConsumer : IMessageHandler<YtsooberCreatedV1>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private ICommandProcessor _commandProcessor;
 
-    public YtsooberCreatedConsumer(IServiceProvider serviceProvider)
+    public YtsooberCreatedConsumer(ICommandProcessor commandProcessor)
     {
-        _serviceProvider =
-            CompositionRootRegistry.GetByModule<PostsModuleConfiguration>()?.ServiceProvider ?? serviceProvider;
+        _commandProcessor = commandProcessor;
     }
 
     public async Task HandleAsync(
@@ -33,8 +32,6 @@ public class YtsooberCreatedConsumer : IMessageHandler<YtsooberCreatedV1>
     )
     {
         var userRegistered = messageContext.Message;
-        var scope = _serviceProvider.CreateScope();
-        var _commandProcessor = scope.ServiceProvider.GetRequiredService<ICommandProcessor>();
         await _commandProcessor.SendAsync(
             new v1.CreateYtsoober(
                 userRegistered.Id,

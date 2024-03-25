@@ -3,6 +3,7 @@ using BuildingBlocks.Abstractions.Web.Module;
 using BuildingBlocks.Core;
 using BuildingBlocks.Core.Extensions;
 using BuildingBlocks.Core.Messaging.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
 using BuildingBlocks.Web.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,7 @@ public class SubscriptionsModuleConfiguration : IModuleDefinition
     )
     {
         services.AddInfrastructure(configuration);
+
         // Add Sub Modules Endpoints
     }
 
@@ -38,14 +40,13 @@ public class SubscriptionsModuleConfiguration : IModuleDefinition
         IWebHostEnvironment environment
     )
     {
+        ServiceActivator.Configure(app.ApplicationServices);
         if (environment.IsEnvironment("test") == false)
         {
             await app.ApplicationServices.StartHostedServices();
         }
+        await app.UsePostgresPersistenceMessage<SubscriptionsModuleConfiguration>();
 
-        ServiceActivator.Configure(app.ApplicationServices);
-
-        app.SubscribeAllMessageFromAssemblyOfType<SubscriptionsRoot>();
         await app.ApplyDatabaseMigrations(logger);
     }
 

@@ -21,7 +21,8 @@ public class MessagePersistenceBackgroundService : BackgroundService
         ILogger<MessagePersistenceBackgroundService> logger,
         IOptions<MessagePersistenceOptions> options,
         IServiceScopeFactory serviceScopeFactory,
-        IMachineInstanceInfo machineInstanceInfo)
+        IMachineInstanceInfo machineInstanceInfo
+    )
     {
         _logger = logger;
         _options = options.Value;
@@ -32,7 +33,8 @@ public class MessagePersistenceBackgroundService : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            $"MessagePersistence Background Service is starting on client '{_machineInstanceInfo.ClientId}' and group '{_machineInstanceInfo.ClientGroup}'.");
+            $"MessagePersistence Background Service is starting on client '{_machineInstanceInfo.ClientId}' and group '{_machineInstanceInfo.ClientGroup}'."
+        );
 
         _executingTask = ProcessAsync(stoppingToken);
 
@@ -51,7 +53,7 @@ public class MessagePersistenceBackgroundService : BackgroundService
 
             var delay = _options.Interval is { }
                 ? TimeSpan.FromSeconds((int)_options.Interval)
-                : TimeSpan.FromSeconds(30);
+                : TimeSpan.FromSeconds(5);
 
             await Task.Delay(delay, stoppingToken);
         }

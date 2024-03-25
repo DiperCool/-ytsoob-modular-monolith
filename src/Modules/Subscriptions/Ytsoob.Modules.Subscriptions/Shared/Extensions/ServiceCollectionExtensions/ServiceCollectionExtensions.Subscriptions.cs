@@ -1,10 +1,17 @@
 using System.Reflection;
+using BuildingBlocks.Abstractions.Messaging;
+using BuildingBlocks.Abstractions.Messaging.PersistMessage;
 using BuildingBlocks.Caching;
 using BuildingBlocks.Caching.Behaviours;
+using BuildingBlocks.Cap;
 using BuildingBlocks.Core.IdsGenerator;
+using BuildingBlocks.Core.Messaging.BackgroundServices;
+using BuildingBlocks.Core.Messaging.MessagePersistence;
 using BuildingBlocks.Core.Persistence.EfCore;
 using BuildingBlocks.Core.Registrations;
 using BuildingBlocks.Logging;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.MessagePersistence;
 using BuildingBlocks.Persistence.EfCore.Postgres;
 using BuildingBlocks.Security;
 using BuildingBlocks.Security.Jwt;
@@ -13,6 +20,7 @@ using BuildingBlocks.Web.Extensions.ServiceCollectionExtensions;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Ytsoob.Modules.Subscriptions.Shared.Contracts;
 using Ytsoob.Modules.Subscriptions.Shared.Data;
 
 namespace Ytsoob.Modules.Subscriptions.Shared.Extensions.ServiceCollectionExtensions;
@@ -21,10 +29,9 @@ public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        SnowFlakIdGenerator.Configure(2);
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+        SnowFlakIdGenerator.Configure(3);
         services.AddControllersAsServices();
+
         services.AddCqrs(doMoreActions: s =>
         {
             s.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>))
@@ -45,16 +52,21 @@ public static partial class ServiceCollectionExtensions
 
         services.AddJwt(configuration);
 
-        services.AddInMemoryMessagePersistence();
-        services.AddInMemoryCommandScheduler();
-        services.AddInMemoryBroker(configuration);
-
+        services.AddSingleton<IBus, CapBus>();
+        services.AddTransient<IMessagePersistenceService, MessagePersistenceService>();
+        services.AddScoped<IMessagePersistenceRepository, PostgresMessagePersistenceRepository>();
+        services.AddHostedService<MessagePersistenceBackgroundService>();
+        services.AddPostgresMessagePersistence(
+            $"{SubscriptionsModuleConfiguration.ModuleName}:{nameof(MessagePersistenceOptions)}"
+        );
         services.AddCustomCaching(configuration, SubscriptionsModuleConfiguration.ModuleName);
         services.AddSingleton<ILoggerFactory>(new Serilog.Extensions.Logging.SerilogLoggerFactory());
         services.AddPostgresDbContext<SubscriptionsDbContext>(
             configuration,
             $"{SubscriptionsModuleConfiguration.ModuleName}:{nameof(PostgresOptions)}"
         );
+        services.AddScoped<ISubscriptionsDbContext>(provider => provider.GetRequiredService<SubscriptionsDbContext>());
+
         return services;
     }
 }

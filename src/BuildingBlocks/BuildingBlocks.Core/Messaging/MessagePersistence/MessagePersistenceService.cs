@@ -9,25 +9,25 @@ using BuildingBlocks.Core.Types;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace BuildingBlocks.Core.Messaging.MessagePersistence.InMemory;
+namespace BuildingBlocks.Core.Messaging.MessagePersistence;
 
-
-public class InMemoryMessagePersistenceService : IMessagePersistenceService
+public class MessagePersistenceService : IMessagePersistenceService
 {
-    private readonly ILogger<InMemoryMessagePersistenceService> _logger;
+    private readonly ILogger<MessagePersistenceService> _logger;
     private readonly IMessagePersistenceRepository _messagePersistenceRepository;
     private readonly IMessageSerializer _messageSerializer;
     private readonly IMediator _mediator;
     private readonly IBus _bus;
     private readonly ISerializer _serializer;
 
-    public InMemoryMessagePersistenceService(
-        ILogger<InMemoryMessagePersistenceService> logger,
+    public MessagePersistenceService(
+        ILogger<MessagePersistenceService> logger,
         IMessagePersistenceRepository messagePersistenceRepository,
         IMessageSerializer messageSerializer,
         IMediator mediator,
         IBus bus,
-        ISerializer serializer)
+        ISerializer serializer
+    )
     {
         _logger = logger;
         _messagePersistenceRepository = messagePersistenceRepository;
@@ -39,14 +39,16 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
     public Task<IReadOnlyList<StoreMessage>> GetByFilterAsync(
         Expression<Func<StoreMessage, bool>>? predicate = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return _messagePersistenceRepository.GetByFilterAsync(predicate ?? (_ => true), cancellationToken);
     }
 
     public async Task AddPublishMessageAsync<TMessageEnvelope>(
         TMessageEnvelope messageEnvelope,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TMessageEnvelope : MessageEnvelope
     {
         await AddMessageCore(messageEnvelope, MessageDeliveryType.Outbox, cancellationToken);
@@ -54,7 +56,8 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
     public async Task AddReceivedMessageAsync<TMessageEnvelope>(
         TMessageEnvelope messageEnvelope,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TMessageEnvelope : MessageEnvelope
     {
         await AddMessageCore(messageEnvelope, MessageDeliveryType.Inbox, cancellationToken);
@@ -62,7 +65,8 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
     public async Task AddInternalMessageAsync<TCommand>(
         TCommand internalCommand,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TCommand : class, IInternalCommand
     {
         await AddMessageCore(new MessageEnvelope(internalCommand), MessageDeliveryType.Internal, cancellationToken);
@@ -70,21 +74,25 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
     public async Task AddNotificationAsync(
         IDomainNotificationEvent notification,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await _messagePersistenceRepository.AddAsync(
             new StoreMessage(
                 notification.EventId,
                 TypeMapper.GetFullTypeName(notification.GetType()),
                 _serializer.Serialize(notification),
-                MessageDeliveryType.Internal),
-            cancellationToken);
+                MessageDeliveryType.Internal
+            ),
+            cancellationToken
+        );
     }
 
     private async Task AddMessageCore(
         MessageEnvelope messageEnvelope,
         MessageDeliveryType deliveryType,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         Guard.Against.Null(messageEnvelope.Message, nameof(messageEnvelope.Message));
 
@@ -107,23 +115,30 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
                 id,
                 TypeMapper.GetFullTypeName(messageEnvelope.Message.GetType()),
                 _messageSerializer.Serialize(messageEnvelope),
-                deliveryType),
-            cancellationToken);
+                deliveryType
+            ),
+            cancellationToken
+        );
 
         _logger.LogInformation(
             "Message with id: {MessageID} and delivery type: {DeliveryType} saved in persistence message store.",
             id,
-            deliveryType.ToString());
+            deliveryType.ToString()
+        );
     }
 
     public async Task ProcessAsync(
         Guid messageId,
         MessageDeliveryType deliveryType,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        var message = (await _messagePersistenceRepository.GetByFilterAsync(
-                x => x.Id == messageId && x.DeliveryType == deliveryType, cancellationToken))
-            .FirstOrDefault();
+        var message = (
+            await _messagePersistenceRepository.GetByFilterAsync(
+                x => x.Id == messageId && x.DeliveryType == deliveryType,
+                cancellationToken
+            )
+        ).FirstOrDefault();
 
         if (message is null)
             return;
@@ -141,13 +156,15 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
                 break;
         }
 
-        message.ChangeState(MessageStatus.Processed);
+        await _messagePersistenceRepository.ChangeStateAsync(message.Id, MessageStatus.Processed, cancellationToken);
     }
 
     public async Task ProcessAllAsync(CancellationToken cancellationToken = default)
     {
-        var messages = await _messagePersistenceRepository
-            .GetByFilterAsync(x => x.MessageStatus != MessageStatus.Processed, cancellationToken);
+        var messages = await _messagePersistenceRepository.GetByFilterAsync(
+            x => x.MessageStatus != MessageStatus.Processed,
+            cancellationToken
+        );
 
         foreach (var message in messages)
         {
@@ -164,20 +181,18 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
         var data = _messageSerializer.Deserialize(
             messageEnvelope.Message.ToString()!,
-            TypeMapper.GetType(message.DataType));
+            TypeMapper.GetType(message.DataType)
+        );
 
         if (data is IMessage)
         {
-            // we should pass a object type message or explicit our message type, not cast to IMessage (data is IMessage integrationEvent) because masstransit doesn't work with IMessage cast.
-            await _bus.PublishAsync(
-                data,
-                messageEnvelope.Headers,
-                cancellationToken);
+            await _bus.PublishAsync(data, messageEnvelope.Headers, cancellationToken);
 
             _logger.LogInformation(
                 "Message with id: {MessageId} and delivery type: {DeliveryType} processed from the persistence message store.",
                 message.Id,
-                message.DeliveryType);
+                message.DeliveryType
+            );
         }
     }
 
@@ -190,7 +205,8 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
 
         var data = _messageSerializer.Deserialize(
             messageEnvelope.Message.ToString()!,
-            TypeMapper.GetType(message.DataType));
+            TypeMapper.GetType(message.DataType)
+        );
 
         if (data is IDomainNotificationEvent domainNotificationEvent)
         {
@@ -199,7 +215,8 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
             _logger.LogInformation(
                 "Domain-Notification with id: {EventID} and delivery type: {DeliveryType} processed from the persistence message store.",
                 message.Id,
-                message.DeliveryType);
+                message.DeliveryType
+            );
         }
 
         if (data is IInternalCommand internalCommand)
@@ -209,7 +226,8 @@ public class InMemoryMessagePersistenceService : IMessagePersistenceService
             _logger.LogInformation(
                 "InternalCommand with id: {EventID} and delivery type: {DeliveryType} processed from the persistence message store.",
                 message.Id,
-                message.DeliveryType);
+                message.DeliveryType
+            );
         }
     }
 

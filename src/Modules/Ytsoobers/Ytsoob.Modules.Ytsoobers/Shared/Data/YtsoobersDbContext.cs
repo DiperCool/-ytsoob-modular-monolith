@@ -8,7 +8,7 @@ namespace Ytsoob.Modules.Ytsoobers.Shared.Data;
 
 public class YtsoobersDbContext : EfDbContextBase
 {
-    public YtsoobersDbContext(DbContextOptions options)
+    public YtsoobersDbContext(DbContextOptions<YtsoobersDbContext> options)
         : base(options) { }
 
     public DbSet<Ytsoober> Ytsoobers => Set<Ytsoober>();

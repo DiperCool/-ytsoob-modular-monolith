@@ -13,7 +13,7 @@ namespace Ytsoob.Modules.Posts.Shared.Data;
 
 public class PostsDbContext : EfDbContextBase
 {
-    public PostsDbContext(DbContextOptions options)
+    public PostsDbContext(DbContextOptions<PostsDbContext> options)
         : base(options) { }
 
     public const string DefaultSchema = "posts";

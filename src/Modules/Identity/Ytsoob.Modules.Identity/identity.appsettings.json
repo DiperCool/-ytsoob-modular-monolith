@@ -26,7 +26,8 @@
       "TokenLifeTimeSecond": 3600
     },
     "MessagePersistenceOptions": {
-      "Interval": 30
+      "Interval": 5,
+      "ConnectionString": "Server=localhost;Port=5432;Database=ytsoob.services.identity;User Id=postgres;Password=postgres;"
     }
   }
 }

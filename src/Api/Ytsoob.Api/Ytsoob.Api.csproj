@@ -4,6 +4,8 @@
     <RootNamespace>Ytsoob.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Cap\BuildingBlocks.Cap.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\BuildingBlocks.Messaging.Persistence.Postgres\BuildingBlocks.Messaging.Persistence.Postgres.csproj" />
     <ProjectReference Include="..\..\Modules\Identity\Ytsoob.Modules.Identity\Ytsoob.Modules.Identity.csproj" />
     <ProjectReference Include="..\..\Modules\Posts\Ytsoob.Modules.Posts\Ytsoob.Modules.Posts.csproj" />
     <ProjectReference Include="..\..\Modules\Subscriptions\Ytsoob.Modules.Subscriptions\Ytsoob.Modules.Subscriptions.csproj" />

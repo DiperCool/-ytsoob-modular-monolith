@@ -15,10 +15,16 @@
       "TokenLifeTimeSecond": 3600
     },
     "MessagePersistenceOptions": {
-      "Interval": 30
+      "Interval": 30,
+      "ConnectionString": "Server=localhost;Port=5432;Database=ytsoob.services.posts;User Id=postgres;Password=postgres;"
     },
     "CacheOptions": {
       "ExpirationTime": 360
+    },
+    "MinioOptions": {
+      "Uri": "localhost:9000",
+      "Username": "access",
+      "Password": "secret1234"
     }
   }
 }

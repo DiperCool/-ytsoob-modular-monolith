@@ -39,8 +39,8 @@ namespace Ytsoob.Modules.Ytsoobers.Shared.Data.Migrations
                         .HasColumnName("created")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer")
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
                         .HasColumnName("created_by");
 
                     b.HasKey("Id")
@@ -65,8 +65,8 @@ namespace Ytsoob.Modules.Ytsoobers.Shared.Data.Migrations
                         .HasColumnName("created")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer")
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint")
                         .HasColumnName("created_by");
 
                     b.Property<bool>("CreatingCompleted")
@@ -155,7 +155,7 @@ namespace Ytsoob.Modules.Ytsoobers.Shared.Data.Migrations
                         .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_ytsoobers_profiles_profile_temp_id");
+                        .HasConstraintName("fk_ytsoobers_profiles_profile_id");
 
                     b.OwnsOne("BuildingBlocks.Core.Domain.ValueObjects.Email", "Email", b1 =>
                         {

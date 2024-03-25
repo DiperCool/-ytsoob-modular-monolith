@@ -81,6 +81,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Subscriptions", "Subscripti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ytsoob.Modules.Subscriptions", "src\Modules\Subscriptions\Ytsoob.Modules.Subscriptions\Ytsoob.Modules.Subscriptions.csproj", "{8E1EC604-D07E-47C7-B310-A119B597CDCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Cap", "src\BuildingBlocks\BuildingBlocks.Cap\BuildingBlocks.Cap.csproj", "{A752910F-78DD-4DA1-9723-D4886A4E7B82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingBlocks.Messaging.Persistence.Postgres", "src\BuildingBlocks\BuildingBlocks.Messaging.Persistence.Postgres\BuildingBlocks.Messaging.Persistence.Postgres.csproj", "{39AE706E-7CFD-498C-82BD-739B12938A5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +131,8 @@ Global
 		{31E18ACA-701E-41E2-B2D1-6DF7A8A496E4} = {FB247B5A-5299-4FFE-BE54-B7E1472D4A2E}
 		{D2E43315-5919-4BDA-B164-0D3A13E0C467} = {9A277A93-3A5C-4E7E-A360-7ED4DD0E9DE1}
 		{8E1EC604-D07E-47C7-B310-A119B597CDCD} = {D2E43315-5919-4BDA-B164-0D3A13E0C467}
+		{A752910F-78DD-4DA1-9723-D4886A4E7B82} = {FB247B5A-5299-4FFE-BE54-B7E1472D4A2E}
+		{39AE706E-7CFD-498C-82BD-739B12938A5D} = {FB247B5A-5299-4FFE-BE54-B7E1472D4A2E}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9063E326-1CDF-4CA7-8D72-CA15AB532EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -229,5 +235,13 @@ Global
 		{8E1EC604-D07E-47C7-B310-A119B597CDCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E1EC604-D07E-47C7-B310-A119B597CDCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E1EC604-D07E-47C7-B310-A119B597CDCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A752910F-78DD-4DA1-9723-D4886A4E7B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A752910F-78DD-4DA1-9723-D4886A4E7B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A752910F-78DD-4DA1-9723-D4886A4E7B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A752910F-78DD-4DA1-9723-D4886A4E7B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39AE706E-7CFD-498C-82BD-739B12938A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39AE706E-7CFD-498C-82BD-739B12938A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39AE706E-7CFD-498C-82BD-739B12938A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39AE706E-7CFD-498C-82BD-739B12938A5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

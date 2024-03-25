@@ -7,6 +7,7 @@ using BuildingBlocks.Abstractions.Persistence;
 using BuildingBlocks.Abstractions.Persistence.EfCore;
 using BuildingBlocks.Core.Extensions;
 using BuildingBlocks.Core.Persistence.EfCore;
+using BuildingBlocks.Core.Persistence.EfCore.Interceptors;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -31,6 +32,7 @@ public static class ServiceCollectionExtensions
         where TDbContext : DbContext, IDbFacadeResolver, IDomainEventContext
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        services.AddScoped<AuditInterceptor>();
 
         var config = configuration.GetOptions<PostgresOptions>(optionSection);
 
@@ -41,7 +43,7 @@ public static class ServiceCollectionExtensions
         Guard.Against.NullOrEmpty(config?.ConnectionString, nameof(config.ConnectionString));
 
         services.AddDbContext<TDbContext>(
-            options =>
+            (sp, options) =>
             {
                 options
                     .UseNpgsql(
@@ -56,7 +58,7 @@ public static class ServiceCollectionExtensions
                     )
                     .UseSnakeCaseNamingConvention();
                 options.ReplaceService<IValueConverterSelector, StronglyTypedIdValueConverterSelector<long>>();
-
+                options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>(), new SoftDeleteInterceptor());
                 builder?.Invoke(options);
             },
             ServiceLifetime.Scoped

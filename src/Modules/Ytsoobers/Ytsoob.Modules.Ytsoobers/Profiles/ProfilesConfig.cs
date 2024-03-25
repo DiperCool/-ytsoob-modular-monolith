@@ -18,7 +18,6 @@ internal static class ProfilesConfig
 
     public static IServiceCollection AddProfilesServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddBlobStorage(configuration, YtsoobersModuleConfiguration.ModuleName);
         services.AddSingleton<IAvatarStorage, AvatarStorage>();
         return services;
     }

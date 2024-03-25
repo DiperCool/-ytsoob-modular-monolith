@@ -1,10 +1,17 @@
+using BuildingBlocks.Abstractions.Messaging;
+using BuildingBlocks.Abstractions.Messaging.PersistMessage;
 using BuildingBlocks.Caching.Behaviours;
+using BuildingBlocks.Cap;
 using BuildingBlocks.Core.IdsGenerator;
+using BuildingBlocks.Core.Messaging.BackgroundServices;
+using BuildingBlocks.Core.Messaging.MessagePersistence;
 using BuildingBlocks.Core.Persistence.EfCore;
 using BuildingBlocks.Core.Registrations;
 using BuildingBlocks.Email;
 using BuildingBlocks.Email.Options;
 using BuildingBlocks.Logging;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.MessagePersistence;
 using BuildingBlocks.Security;
 using BuildingBlocks.Validation;
 using BuildingBlocks.Web.Extensions.ServiceCollectionExtensions;
@@ -23,10 +30,7 @@ public static partial class ServiceCollectionExtensions
             s.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>))
                 .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamRequestValidationBehavior<,>))
                 .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamLoggingBehavior<,>))
-                .AddScoped(typeof(IStreamPipelineBehavior<,>), typeof(StreamCachingBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>))
-                .AddScoped(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>))
-                .AddScoped(typeof(IPipelineBehavior<,>), typeof(InvalidateCachingBehavior<,>))
                 .AddScoped(typeof(IPipelineBehavior<,>), typeof(EfTxBehavior<,>));
         });
 
@@ -40,9 +44,13 @@ public static partial class ServiceCollectionExtensions
 
         services.AddJwt(configuration);
 
-        services.AddInMemoryMessagePersistence();
-        services.AddInMemoryCommandScheduler();
-        services.AddInMemoryBroker(configuration);
+        services.AddSingleton<IBus, CapBus>();
+        services.AddTransient<IMessagePersistenceService, MessagePersistenceService>();
+        services.AddScoped<IMessagePersistenceRepository, PostgresMessagePersistenceRepository>();
+        services.AddHostedService<MessagePersistenceBackgroundService>();
+        services.AddPostgresMessagePersistence(
+            $"{IdentityModuleConfiguration.ModuleName}:{nameof(MessagePersistenceOptions)}"
+        );
 
         services.AddSingleton<ILoggerFactory>(new Serilog.Extensions.Logging.SerilogLoggerFactory());
 

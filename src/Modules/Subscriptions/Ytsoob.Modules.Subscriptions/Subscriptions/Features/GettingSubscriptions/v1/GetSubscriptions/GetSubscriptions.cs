@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Ytsoob.Modules.Subscriptions.Shared.Contracts;
+using Ytsoob.Modules.Subscriptions.Shared.Data;
 using Ytsoob.Modules.Subscriptions.Subscriptions.Dtos;
 using Ytsoob.Modules.Subscriptions.Subscriptions.Models;
 
@@ -44,6 +45,7 @@ public class GetPostsEndpoint : IMinimalEndpoint
         [FromQuery] long ytsooberId,
         [FromQuery] int page,
         [FromQuery] int pageSize,
+        [FromServices] ISubscriptionsDbContext service,
         IGatewayProcessor<SubscriptionsModuleConfiguration> queryProcessor,
         CancellationToken cancellationToken
     )
@@ -73,10 +75,10 @@ public class GetSubscriptionsValidator : AbstractValidator<GetSubscriptions>
 
 public class GetSubscriptionsHandler : IRequestHandler<GetSubscriptions, GetSubscriptionsResult>
 {
-    private ISubscriptionsDbContext _postsDbContext;
+    private SubscriptionsDbContext _postsDbContext;
     private IMapper _mapper;
 
-    public GetSubscriptionsHandler(ISubscriptionsDbContext postsDbContext, IMapper mapper)
+    public GetSubscriptionsHandler(SubscriptionsDbContext postsDbContext, IMapper mapper)
     {
         _postsDbContext = postsDbContext;
         _mapper = mapper;

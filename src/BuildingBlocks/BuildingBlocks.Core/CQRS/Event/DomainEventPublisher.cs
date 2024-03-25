@@ -20,19 +20,22 @@ public class DomainEventPublisher : IDomainEventPublisher
         IMessagePersistenceService messagePersistenceService,
         IDomainNotificationEventPublisher domainNotificationEventPublisher,
         IDomainEventsAccessor domainEventsAccessor,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider
+    )
     {
         _messagePersistenceService = messagePersistenceService;
         _domainEventsAccessor = domainEventsAccessor;
-        _domainNotificationEventPublisher =
-            Guard.Against.Null(domainNotificationEventPublisher, nameof(domainNotificationEventPublisher));
+        _domainNotificationEventPublisher = Guard.Against.Null(
+            domainNotificationEventPublisher,
+            nameof(domainNotificationEventPublisher)
+        );
         _eventProcessor = Guard.Against.Null(eventProcessor, nameof(eventProcessor));
         _serviceProvider = Guard.Against.Null(serviceProvider, nameof(serviceProvider));
     }
 
     public Task PublishAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
-        return PublishAsync(new[] {domainEvent}, cancellationToken);
+        return PublishAsync(new[] { domainEvent }, cancellationToken);
     }
 
     public async Task PublishAsync(IDomainEvent[] domainEvents, CancellationToken cancellationToken = default)
@@ -41,7 +44,6 @@ public class DomainEventPublisher : IDomainEventPublisher
 
         if (!domainEvents.Any())
             return;
-
 
         // https://github.com/dotnet-architecture/eShopOnContainers/issues/700#issuecomment-461807560
         // https://github.com/dotnet-architecture/eShopOnContainers/blob/e05a87658128106fef4e628ccb830bc89325d9da/src/Services/Ordering/Ordering.Infrastructure/OrderingContext.cs#L65
@@ -67,27 +69,27 @@ public class DomainEventPublisher : IDomainEventPublisher
         foreach (var wrappedIntegrationEvent in wrappedIntegrationEvents)
         {
             await _messagePersistenceService.AddPublishMessageAsync(
-                new MessageEnvelope(wrappedIntegrationEvent, new Dictionary<string, object?>()),
-                cancellationToken);
+                new MessageEnvelope(wrappedIntegrationEvent, new Dictionary<string, string>()),
+                cancellationToken
+            );
         }
 
         IReadOnlyList<IEventMapper> eventMappers = _serviceProvider.GetServices<IEventMapper>().ToImmutableList();
 
         // Save event mapper events into outbox for further processing after commit
-        var integrationEvents =
-            GetIntegrationEvents(_serviceProvider, eventMappers, eventsToDispatch);
+        var integrationEvents = GetIntegrationEvents(_serviceProvider, eventMappers, eventsToDispatch);
         if (integrationEvents.Any())
         {
             foreach (var integrationEvent in integrationEvents)
             {
                 await _messagePersistenceService.AddPublishMessageAsync(
-                    new MessageEnvelope(integrationEvent, new Dictionary<string, object?>()),
-                    cancellationToken);
+                    new MessageEnvelope(integrationEvent, new Dictionary<string, string>()),
+                    cancellationToken
+                );
             }
         }
 
-        var notificationEvents =
-            GetNotificationEvents(_serviceProvider, eventMappers, eventsToDispatch);
+        var notificationEvents = GetNotificationEvents(_serviceProvider, eventMappers, eventsToDispatch);
 
         if (notificationEvents.Any())
         {
@@ -101,10 +103,12 @@ public class DomainEventPublisher : IDomainEventPublisher
     private IReadOnlyList<IDomainNotificationEvent> GetNotificationEvents(
         IServiceProvider serviceProvider,
         IReadOnlyList<IEventMapper> eventMappers,
-        IReadOnlyList<IDomainEvent> eventsToDispatch)
+        IReadOnlyList<IDomainEvent> eventsToDispatch
+    )
     {
-        IReadOnlyList<IIDomainNotificationEventMapper> notificationEventMappers =
-            serviceProvider.GetServices<IIDomainNotificationEventMapper>().ToImmutableList();
+        IReadOnlyList<IIDomainNotificationEventMapper> notificationEventMappers = serviceProvider
+            .GetServices<IIDomainNotificationEventMapper>()
+            .ToImmutableList();
 
         List<IDomainNotificationEvent> notificationEvents = new List<IDomainNotificationEvent>();
 
@@ -137,10 +141,12 @@ public class DomainEventPublisher : IDomainEventPublisher
     private static IReadOnlyList<IIntegrationEvent> GetIntegrationEvents(
         IServiceProvider serviceProvider,
         IReadOnlyList<IEventMapper> eventMappers,
-        IReadOnlyList<IDomainEvent> eventsToDispatch)
+        IReadOnlyList<IDomainEvent> eventsToDispatch
+    )
     {
-        IReadOnlyList<IIntegrationEventMapper> integrationEventMappers =
-            serviceProvider.GetServices<IIntegrationEventMapper>().ToImmutableList();
+        IReadOnlyList<IIntegrationEventMapper> integrationEventMappers = serviceProvider
+            .GetServices<IIntegrationEventMapper>()
+            .ToImmutableList();
 
         List<IIntegrationEvent> integrationEvents = new List<IIntegrationEvent>();
 

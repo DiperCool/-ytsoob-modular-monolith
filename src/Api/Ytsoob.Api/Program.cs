@@ -1,14 +1,29 @@
+using BuildingBlocks.Abstractions.Messaging;
+using BuildingBlocks.Abstractions.Messaging.PersistMessage;
+using BuildingBlocks.BlobStorage;
+using BuildingBlocks.Caching;
+using BuildingBlocks.Caching.Behaviours;
+using BuildingBlocks.Cap;
 using BuildingBlocks.Core.Extensions;
 using BuildingBlocks.Core.Extensions.ServiceCollection;
+using BuildingBlocks.Core.Messaging.BackgroundServices;
+using BuildingBlocks.Core.Messaging.MessagePersistence;
+using BuildingBlocks.Core.Persistence.EfCore;
+using BuildingBlocks.Core.Registrations;
+using BuildingBlocks.Email;
 using BuildingBlocks.Logging;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.MessagePersistence;
 using BuildingBlocks.Security;
 using BuildingBlocks.Security.Jwt;
 using BuildingBlocks.Swagger;
+using BuildingBlocks.Validation;
 using BuildingBlocks.Web;
 using BuildingBlocks.Web.Extensions;
 using BuildingBlocks.Web.Extensions.ServiceCollectionExtensions;
 using BuildingBlocks.Web.Module;
 using Hellang.Middleware.ProblemDetails;
+using MediatR;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Serilog;
@@ -18,6 +33,7 @@ using Ytsoob.Api.Extensions.ApplicationBuilderExtensions;
 using Ytsoob.Api.Extensions.ServiceCollectionExtensions;
 using Ytsoob.Modules.Identity;
 using Ytsoob.Modules.Posts;
+using Ytsoob.Modules.Subscriptions;
 using Ytsoob.Modules.Ytsoobers;
 
 // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis
@@ -56,6 +72,8 @@ static void RegisterServices(WebApplicationBuilder builder)
         builder.Environment.ContentRootPath,
         builder.Environment.EnvironmentName
     );
+
+    builder.Services.AddCustomCap();
 
     // https://www.michaco.net/blog/EnvironmentVariablesAndConfigurationInASPNETCoreApps#environment-variables-and-configuration
     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#non-prefixed-environment-variables
@@ -107,7 +125,13 @@ static void RegisterServices(WebApplicationBuilder builder)
 
     builder.Services.AddCustomVersioning();
     builder.AddCustomSwagger(
-        new[] { typeof(IdentityRoot).Assembly, typeof(YtsoobersRoot).Assembly, typeof(PostsRoot).Assembly, }
+        new[]
+        {
+            typeof(IdentityRoot).Assembly,
+            typeof(YtsoobersRoot).Assembly,
+            typeof(PostsRoot).Assembly,
+            typeof(SubscriptionsRoot).Assembly
+        }
     );
 
     builder.Services.AddCustomJwtAuthentication(builder.Configuration);
@@ -126,7 +150,6 @@ static async Task ConfigureApplication(WebApplication app)
     var environment = app.Environment;
 
     app.UseProblemDetails();
-
     app.UseSerilogRequestLogging();
 
     app.UseRouting();

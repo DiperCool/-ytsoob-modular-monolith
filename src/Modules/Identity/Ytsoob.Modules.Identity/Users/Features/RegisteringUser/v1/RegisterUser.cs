@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using BuildingBlocks.Abstractions.CQRS.Command;
 using BuildingBlocks.Abstractions.Messaging;
 using BuildingBlocks.Abstractions.Messaging.PersistMessage;
+using BuildingBlocks.Core.Exception.Types;
 using BuildingBlocks.Core.IdsGenerator;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -120,10 +121,9 @@ internal class RegisterUserHandler : ICommandHandler<RegisterUser, RegisterUserR
         // publish our integration event and save to outbox should do in same transaction of our business logic actions. we could use TxBehaviour or ITxDbContextExecutes interface
         // This service is not DDD, so we couldn't use DomainEventPublisher to publish mapped integration events
         await _messagePersistenceService.AddPublishMessageAsync(
-            new MessageEnvelope<UserRegistered>(userRegistered, new Dictionary<string, object?>()),
+            new MessageEnvelope<UserRegistered>(userRegistered, new Dictionary<string, string>()),
             cancellationToken
         );
-
         return new RegisterUserResponse(
             new IdentityUserDto
             {

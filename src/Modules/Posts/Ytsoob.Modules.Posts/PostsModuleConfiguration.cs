@@ -3,6 +3,7 @@ using BuildingBlocks.Abstractions.Web.Module;
 using BuildingBlocks.Core;
 using BuildingBlocks.Core.Extensions;
 using BuildingBlocks.Core.Messaging.Extensions;
+using BuildingBlocks.Messaging.Persistence.Postgres.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,8 +15,10 @@ using Ytsoob.Modules.Posts.Comments;
 using Ytsoob.Modules.Posts.Contents;
 using Ytsoob.Modules.Posts.Polls;
 using Ytsoob.Modules.Posts.Posts;
+using Ytsoob.Modules.Posts.Shared.Contracts;
 using Ytsoob.Modules.Posts.Shared.Extensions.ApplicationBuilderExtensions;
 using Ytsoob.Modules.Posts.Shared.Extensions.ServiceCollectionExtensions;
+using Ytsoob.Modules.Posts.Shared.Services;
 
 namespace Ytsoob.Modules.Posts;
 
@@ -30,6 +33,9 @@ public class PostsModuleConfiguration : IModuleDefinition
         IWebHostEnvironment environment
     )
     {
+        services.AddScoped<ICacheYtsooberOptions, CacheYtsooberOptions>();
+        services.AddScoped<ICacheYtsooberReaction, CacheYtsooberReaction>();
+
         services.AddInfrastructure(configuration);
         // Add Sub Modules Endpoints
     }
@@ -41,14 +47,12 @@ public class PostsModuleConfiguration : IModuleDefinition
         IWebHostEnvironment environment
     )
     {
+        ServiceActivator.Configure(app.ApplicationServices);
         if (environment.IsEnvironment("test") == false)
         {
             await app.ApplicationServices.StartHostedServices();
         }
-
-        ServiceActivator.Configure(app.ApplicationServices);
-
-        app.SubscribeAllMessageFromAssemblyOfType<PostsRoot>();
+        await app.UsePostgresPersistenceMessage<PostsModuleConfiguration>();
 
         await app.ApplyDatabaseMigrations(logger);
     }

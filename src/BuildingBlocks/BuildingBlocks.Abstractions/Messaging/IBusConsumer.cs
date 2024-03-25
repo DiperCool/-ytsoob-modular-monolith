@@ -10,7 +10,8 @@ public interface IBusConsumer
     /// <typeparam name="TMessage">A type that implements the <see cref="IMessage"/>.</typeparam>
     void Consume<TMessage>(
         IMessageHandler<TMessage> handler,
-        Action<IConsumeConfigurationBuilder>? consumeBuilder = null)
+        Action<IConsumeConfigurationBuilder>? consumeBuilder = null
+    )
         where TMessage : class, IMessage;
 
     /// <summary>
@@ -21,7 +22,8 @@ public interface IBusConsumer
     /// <typeparam name="TMessage">A type that implements the <see cref="IMessage"/>.</typeparam>
     void Consume<TMessage>(
         MessageHandler<TMessage> subscribeMethod,
-        Action<IConsumeConfigurationBuilder>? consumeBuilder = null)
+        Action<IConsumeConfigurationBuilder>? consumeBuilder = null
+    )
         where TMessage : class, IMessage;
 
     /// <summary>
@@ -37,7 +39,6 @@ public interface IBusConsumer
     /// <param name="messageType"></param>
     void Consume(Type messageType);
 
-
     /// <summary>
     /// Consume a message with <see cref="TMessage"/> type and <see cref="THandler"/> handler.
     /// </summary>
@@ -46,31 +47,4 @@ public interface IBusConsumer
     void Consume<THandler, TMessage>()
         where THandler : IMessageHandler<TMessage>
         where TMessage : class, IMessage;
-
-    /// <summary>
-    /// consume all messages that implements the <see cref="IMessageHandler{TMessage}"/> interface.
-    /// </summary>
-    void ConsumeAll();
-
-    /// <summary>
-    /// consume all messages that implements the <see cref="IMessageHandler{TMessage}"/> interface from the assembly of the provided type
-    /// </summary>
-    /// <typeparam name="TType">A type for discovering associated assembly.</typeparam>
-    void ConsumeAllFromAssemblyOf<TType>();
-
-    /// <summary>
-    /// consume all messages that implements the <see cref="IMessageHandler{TMessage}"/> interface from the assemblies of the provided types
-    /// </summary>
-    /// <param name="assemblyMarkerTypes">Types for discovering associated assemblies.</param>
-    void ConsumeAllFromAssemblyOf(params Type[] assemblyMarkerTypes);
-
-    void RemoveConsume(Type messageType);
-
-    void RemoveAllConsume();
-
-    void RemoveAllConsumeFromAssemblyOf<TType>();
-
-    void RemoveAllConsumeFromAssemblyOf(params Type[] assemblyMarkerTypes);
-
-    event Action<object, Type> MessageConsumed;
 }
